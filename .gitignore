@@ -1,0 +1,19 @@
+# Unity generated
+/[Ll]ibrary/
+/[Tt]emp/
+/[Oo]bj/
+/[Bb]uild/
+/[Bb]uilds/
+/[Ll]ogs/
+/[Uu]ser[Ss]ettings/
+
+# Visual Studio / VS Code
+*.csproj
+*.sln
+*.userprefs
+*.vscode/
+.idea/
+
+# Windows
+Thumbs.db
+*.tmp
