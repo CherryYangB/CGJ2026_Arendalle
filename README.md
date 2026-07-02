@@ -1,4 +1,5 @@
 # Ciga Game Jam（China）2026
+##ARENDALLE代表队##
 
 ---
 
@@ -32,7 +33,7 @@ We aim to create a heartfelt short game experience where art and music are the c
 
 | 角色 / Role | 姓名 / Name |
 | :--- | :--- |
-| **策划&程序员 / Programmer&Designer** | Yang阳B |
+| **策划&程序员 / Designer&Programmer** | Yang阳B |
 | **程序员 / Programmer** | Nour |
 | **美术 / Artist** | Sophialexa |
 | **美术 / Artist** | 凇淞 |
