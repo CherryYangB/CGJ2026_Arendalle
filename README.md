@@ -17,8 +17,8 @@ Now, we're channeling that bond into our very first game jam project for CGJ 202
 ## 🎯 开发目标 / Development Goals
 
 我们希望打造一款以美术和音乐为核心、情感驱动的短篇游戏体验。
-- **玩法：** 2D 探索 / 节奏交互  
-- **美术风格：** 手绘 / 像素风  
+- **玩法：** 2D 探索 / 节奏交互 / 视觉
+- **美术风格：** 手绘   
 - **音乐：** 原创配乐
 - 
 We aim to create a heartfelt short game experience where art and music are the core of the gameplay.
