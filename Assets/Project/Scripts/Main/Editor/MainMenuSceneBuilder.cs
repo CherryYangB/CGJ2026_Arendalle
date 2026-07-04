@@ -22,9 +22,14 @@ namespace Arendalle.EditorTools
         private const string ChapterBackgroundSpritePath = "Assets/Project/Art/Background/bg_bg_s1_v1.png";
         private const string MemoHomeSpritePath = "Assets/Project/Art/Background/bg_memo_home.png";
         private const string MemoPageOneSpritePath = "Assets/Project/Art/Background/bg_memo_page_1.png";
-        private const string TodoListSpritePath = "Assets/Project/Art/Sprites/todo_list.png";
-        private const string BlueBarcodeCardSpritePath = "Assets/Project/Art/Sprites/blue_barcode_card.png";
-        private const string YellowNoteClipSpritePath = "Assets/Project/Art/Sprites/yellow_note_clip.png";
+        private const string ChapterSpriteFolder = "Assets/Project/Art/Sprites/Chapter_1";
+        private const string TodoListSpritePath = ChapterSpriteFolder + "/todo_list.png";
+        private const string TodoListDetailSpritePath = ChapterSpriteFolder + "/detail_todo_list.png";
+        private const string BlueBarcodeCardSpritePath = ChapterSpriteFolder + "/blue_barcode_card.png";
+        private const string BlueBarcodeCardDetailSpritePath = ChapterSpriteFolder + "/detail_blue_barcode_card_font.png";
+        private const string YellowNoteClipSpritePath = ChapterSpriteFolder + "/yellow_note_clip.png";
+        private const string YellowNoteClipDetailSpritePath = ChapterSpriteFolder + "/detail_yellow_note_clip.png";
+        private const string WatchSpritePath = ChapterSpriteFolder + "/watch.png";
         private const string AutoRunRequestPath = "Temp/RebuildHomeMenu.request";
 
         static MainMenuSceneBuilder()
@@ -104,8 +109,12 @@ namespace Arendalle.EditorTools
             EnsureSpriteImport(MemoHomeSpritePath);
             EnsureSpriteImport(MemoPageOneSpritePath);
             EnsureSpriteImport(TodoListSpritePath);
+            EnsureSpriteImport(TodoListDetailSpritePath);
             EnsureSpriteImport(BlueBarcodeCardSpritePath);
+            EnsureSpriteImport(BlueBarcodeCardDetailSpritePath);
             EnsureSpriteImport(YellowNoteClipSpritePath);
+            EnsureSpriteImport(YellowNoteClipDetailSpritePath);
+            EnsureSpriteImport(WatchSpritePath);
         }
 
         private static void EnsureSpriteImport(string assetPath)
@@ -452,8 +461,12 @@ namespace Arendalle.EditorTools
             Sprite memoHomeSprite = AssetDatabase.LoadAssetAtPath<Sprite>(MemoHomeSpritePath);
             Sprite memoPageOneSprite = AssetDatabase.LoadAssetAtPath<Sprite>(MemoPageOneSpritePath);
             Sprite todoListSprite = AssetDatabase.LoadAssetAtPath<Sprite>(TodoListSpritePath);
+            Sprite todoListDetailSprite = AssetDatabase.LoadAssetAtPath<Sprite>(TodoListDetailSpritePath);
             Sprite blueBarcodeCardSprite = AssetDatabase.LoadAssetAtPath<Sprite>(BlueBarcodeCardSpritePath);
+            Sprite blueBarcodeCardDetailSprite = AssetDatabase.LoadAssetAtPath<Sprite>(BlueBarcodeCardDetailSpritePath);
             Sprite yellowNoteClipSprite = AssetDatabase.LoadAssetAtPath<Sprite>(YellowNoteClipSpritePath);
+            Sprite yellowNoteClipDetailSprite = AssetDatabase.LoadAssetAtPath<Sprite>(YellowNoteClipDetailSpritePath);
+            Sprite watchSprite = AssetDatabase.LoadAssetAtPath<Sprite>(WatchSpritePath);
             Font font = GetDefaultFont();
 
             GameObject canvasObject = new GameObject("ChapterCanvas", typeof(RectTransform), typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
@@ -550,6 +563,8 @@ namespace Arendalle.EditorTools
             SetRect(detailText.rectTransform, new Vector2(0.5f, 0.19f), new Vector2(980f, 190f));
             detailRoot.SetActive(false);
 
+            WatchTimeDisplay watchTimeDisplay = CreateWatchLayer(canvasObject.transform, watchSprite, font, detailRoot.transform);
+
             GameObject controllerObject = new GameObject("ChapterOneController");
             ChapterOneController controller = controllerObject.AddComponent<ChapterOneController>();
             ConfigureChapterOneController(
@@ -565,9 +580,10 @@ namespace Arendalle.EditorTools
                 todoListButton,
                 blueBarcodeCardButton,
                 yellowNoteClipButton,
-                todoListSprite,
-                blueBarcodeCardSprite,
-                yellowNoteClipSprite,
+                todoListDetailSprite,
+                blueBarcodeCardDetailSprite,
+                yellowNoteClipDetailSprite,
+                watchTimeDisplay,
                 detailGroup,
                 detailBackdropButton,
                 detailBackdrop,
@@ -658,6 +674,112 @@ namespace Arendalle.EditorTools
             image.raycastTarget = true;
 
             return AddInvisibleButton(image);
+        }
+
+        private static WatchTimeDisplay CreateWatchLayer(Transform parent, Sprite watchSprite, Font font, Transform beforeSibling)
+        {
+            GameObject watchLayer = CreateUiObject("WatchLayer", parent);
+            if (beforeSibling != null)
+            {
+                watchLayer.transform.SetSiblingIndex(beforeSibling.GetSiblingIndex());
+            }
+
+            Stretch(watchLayer.GetComponent<RectTransform>());
+            WatchTimeDisplay watchTimeDisplay = watchLayer.AddComponent<WatchTimeDisplay>();
+
+            Vector2 sceneWatchSize = new Vector2(168f, 924f);
+            Image sceneWatch = CreateImage("WatchSprite", watchLayer.transform, watchSprite, Color.white);
+            SetRect(sceneWatch.rectTransform, new Vector2(0.5f, 0.5f), sceneWatchSize, new Vector2(-128f, 0f));
+            sceneWatch.preserveAspect = true;
+            sceneWatch.raycastTarget = true;
+            Button sceneWatchButton = AddInvisibleButton(sceneWatch);
+
+            Text sceneDateText = CreateWatchDateText("WatchDate", sceneWatch.transform, font, 22);
+            SetWatchDateRect(sceneDateText.rectTransform, sceneWatchSize);
+
+            GameObject detailRoot = CreateUiObject("WatchDetailOverlay", watchLayer.transform);
+            Stretch(detailRoot.GetComponent<RectTransform>());
+            CanvasGroup detailGroup = detailRoot.AddComponent<CanvasGroup>();
+            detailGroup.alpha = 0f;
+            detailGroup.interactable = false;
+            detailGroup.blocksRaycasts = false;
+
+            Image detailBackdrop = CreateImage("WatchDetailBackdrop", detailRoot.transform, null, new Color(0f, 0f, 0f, 0f));
+            Stretch(detailBackdrop.rectTransform);
+            detailBackdrop.raycastTarget = true;
+            Button detailBackdropButton = AddInvisibleButton(detailBackdrop);
+
+            Vector2 detailWatchSize = new Vector2(194f, 1066f);
+            Image detailWatch = CreateImage("WatchDetailSprite", detailRoot.transform, watchSprite, Color.white);
+            SetRect(detailWatch.rectTransform, new Vector2(0.5f, 0.5f), detailWatchSize, new Vector2(-300f, 0f));
+            detailWatch.preserveAspect = true;
+            detailWatch.raycastTarget = false;
+
+            Text detailDateText = CreateWatchDateText("WatchDetailDate", detailWatch.transform, font, 22);
+            SetWatchDateRect(detailDateText.rectTransform, detailWatchSize);
+            detailDateText.rectTransform.sizeDelta = sceneDateText.rectTransform.sizeDelta;
+            InputField detailDateInputField = AddDateInputField(detailDateText);
+
+            Text copyText = CreateText("WatchDetailCopyText", detailRoot.transform, string.Empty, font, 34, TextAnchor.UpperLeft);
+            copyText.color = new Color(0.98f, 0.96f, 0.88f, 1f);
+            SetRect(copyText.rectTransform, new Vector2(0.72f, 0.5f), new Vector2(460f, 620f));
+
+            detailRoot.SetActive(false);
+
+            SerializedObject serializedObject = new SerializedObject(watchTimeDisplay);
+            serializedObject.FindProperty("sceneWatchTransform").objectReferenceValue = sceneWatch.rectTransform;
+            serializedObject.FindProperty("sceneWatchButton").objectReferenceValue = sceneWatchButton;
+            serializedObject.FindProperty("sceneDateText").objectReferenceValue = sceneDateText;
+            serializedObject.FindProperty("detailGroup").objectReferenceValue = detailGroup;
+            serializedObject.FindProperty("detailBackdropImage").objectReferenceValue = detailBackdrop;
+            serializedObject.FindProperty("detailBackdropButton").objectReferenceValue = detailBackdropButton;
+            serializedObject.FindProperty("detailWatchTransform").objectReferenceValue = detailWatch.rectTransform;
+            serializedObject.FindProperty("detailDateText").objectReferenceValue = detailDateText;
+            serializedObject.FindProperty("detailDateInputField").objectReferenceValue = detailDateInputField;
+            serializedObject.FindProperty("syncDetailDateLayoutFromScene").boolValue = true;
+            serializedObject.FindProperty("dockedPosition").vector2Value = new Vector2(-835f, -365f);
+            serializedObject.FindProperty("dockedSize").vector2Value = new Vector2(204f, 1122f);
+            serializedObject.FindProperty("dockedRotation").floatValue = -28f;
+            serializedObject.FindProperty("fadeDuration").floatValue = 0.24f;
+            serializedObject.FindProperty("detailScaleDuration").floatValue = 0.28f;
+            serializedObject.FindProperty("detailBackdropAlpha").floatValue = 0.68f;
+            serializedObject.ApplyModifiedPropertiesWithoutUndo();
+
+            return watchTimeDisplay;
+        }
+
+        private static InputField AddDateInputField(Text text)
+        {
+            text.raycastTarget = true;
+            InputField inputField = text.gameObject.AddComponent<InputField>();
+            inputField.textComponent = text;
+            inputField.targetGraphic = text;
+            inputField.transition = Selectable.Transition.None;
+            inputField.contentType = InputField.ContentType.Standard;
+            inputField.lineType = InputField.LineType.SingleLine;
+            inputField.characterLimit = 8;
+            return inputField;
+        }
+
+        private static Text CreateWatchDateText(string name, Transform parent, Font font, int maxSize)
+        {
+            Text text = CreateText(name, parent, string.Empty, font, maxSize, TextAnchor.MiddleCenter);
+            text.color = new Color(0.98f, 1f, 0.96f, 1f);
+            text.fontStyle = FontStyle.Bold;
+            text.horizontalOverflow = HorizontalWrapMode.Overflow;
+            text.resizeTextForBestFit = true;
+            text.resizeTextMinSize = 4;
+            text.resizeTextMaxSize = maxSize;
+            return text;
+        }
+
+        private static void SetWatchDateRect(RectTransform rectTransform, Vector2 watchSize)
+        {
+            SetRect(
+                rectTransform,
+                new Vector2(0.5f, 0.5f),
+                new Vector2(watchSize.x * 0.68f, watchSize.y * 0.055f),
+                new Vector2(0f, watchSize.y * 0.115f));
         }
 
         private static Button AddInvisibleButton(Image image)
@@ -754,6 +876,7 @@ namespace Arendalle.EditorTools
             Sprite todoListDetailSprite,
             Sprite blueBarcodeCardDetailSprite,
             Sprite yellowNoteClipDetailSprite,
+            WatchTimeDisplay watchTimeDisplay,
             CanvasGroup detailGroup,
             Button detailBackdropButton,
             Image detailBackdropImage,
@@ -781,6 +904,7 @@ namespace Arendalle.EditorTools
             serializedObject.FindProperty("yellowNoteClipTransform").objectReferenceValue = yellowNoteClipButton.GetComponent<RectTransform>();
             serializedObject.FindProperty("yellowNoteClipDetailSprite").objectReferenceValue = yellowNoteClipDetailSprite;
             serializedObject.FindProperty("yellowNoteClipDetailText").stringValue = "黄色便签\n纸上写着按时吃药，边角的磨损说明它已经被反复看过很多次。";
+            serializedObject.FindProperty("watchTimeDisplay").objectReferenceValue = watchTimeDisplay;
             serializedObject.FindProperty("detailGroup").objectReferenceValue = detailGroup;
             serializedObject.FindProperty("detailBackdropButton").objectReferenceValue = detailBackdropButton;
             serializedObject.FindProperty("detailBackdropImage").objectReferenceValue = detailBackdropImage;
