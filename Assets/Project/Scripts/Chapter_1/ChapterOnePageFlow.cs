@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -11,36 +12,55 @@ namespace Arendalle
         [Header("References")]
         [SerializeField] private ChapterOneController chapterController;
         [SerializeField] private WatchTimeDisplay watchTimeDisplay;
-        [SerializeField] private ChapterOnePageItem weddingInvitation;
+
+        [Header("Page 1")]
+        [SerializeField] private ChapterOnePageItem memoDay;
         [SerializeField] private ChapterOnePageItem[] movieTickets;
+        [SerializeField] private Text firstPageText;
+        [SerializeField] private Text ticketCaptionText;
+        [SerializeField] private ChapterOnePageItem memoDayDateGateItem;
+        [SerializeField] private string memoDayUnlockDate = "20:07";
+        [SerializeField] private string movieTicketUnlockDate = "03:05";
+
+        [Header("Page 2")]
+        [SerializeField] private ChapterOnePageItem weddingInvitation;
         [SerializeField] private ChapterOnePageItem marriedPhoto;
+        [SerializeField] private Text secondPageText;
+        [SerializeField] private ChapterOnePageItem weddingInvitationDateGateItem;
+        [SerializeField] private string weddingInvitationUnlockDate = "11:22";
+        [SerializeField] private ChapterOnePageItem marriedPhotoDateGateItem;
+        [SerializeField] private string marriedPhotoEndingDate = "05:20";
 
         [Header("Ending Video")]
         [SerializeField] private VideoClip endingVideoClip;
         [SerializeField] private string nextSceneName = "Chapter_2";
         [SerializeField] private float missingVideoFallbackDelay = 0.25f;
 
-        private bool ticketsUnlocked;
-        private bool photoUnlocked;
+        private bool memoDayDateCompleted;
+        private bool movieTicketDateCompleted;
+        private bool marriedPhotoDateCompleted;
+        private bool weddingInvitationDateCompleted;
         private bool endingStarted;
 
         private void Awake()
         {
             ResolveReferences();
             RegisterListeners();
-            ApplyVisibility(false);
+            ApplyVisibility();
+            UpdateControllerUnlock();
         }
 
         private void OnDestroy()
         {
             if (chapterController != null)
             {
-                chapterController.PageTurnStateChanged -= HandlePageTurnStateChanged;
+                chapterController.PageIndexChanged -= HandlePageIndexChanged;
+                chapterController.FinalPageTurned -= HandleFinalPageTurned;
             }
 
             if (watchTimeDisplay != null)
             {
-                watchTimeDisplay.DateChanged -= HandleDateChanged;
+                watchTimeDisplay.TimeChanged -= HandleTimeChanged;
             }
         }
 
@@ -55,65 +75,179 @@ namespace Arendalle
             {
                 watchTimeDisplay = FindObjectOfType<WatchTimeDisplay>();
             }
+
+            if (memoDay == null)
+            {
+                memoDay = FindPageItem("MemoDay");
+            }
+
+            if (movieTickets == null || movieTickets.Length == 0)
+            {
+                movieTickets = new[]
+                {
+                    FindPageItem("MovieTicket1"),
+                    FindPageItem("MovieTicket2")
+                };
+            }
+
+            if (weddingInvitation == null)
+            {
+                weddingInvitation = FindPageItem("WeddingInvitationCard");
+            }
+
+            if (marriedPhoto == null)
+            {
+                marriedPhoto = FindPageItem("MarriedPhoto");
+            }
+
+            if (firstPageText == null)
+            {
+                firstPageText = FindText("FirstPageText");
+            }
+
+            if (ticketCaptionText == null)
+            {
+                ticketCaptionText = FindText("TicketCaptionText");
+            }
+
+            if (secondPageText == null)
+            {
+                secondPageText = FindText("SecondPageText");
+            }
+
+            if (memoDayDateGateItem == null)
+            {
+                memoDayDateGateItem = memoDay;
+            }
+
+            if (weddingInvitationDateGateItem == null)
+            {
+                weddingInvitationDateGateItem = weddingInvitation;
+            }
+
+            if (marriedPhotoDateGateItem == null)
+            {
+                marriedPhotoDateGateItem = marriedPhoto;
+            }
         }
 
         private void RegisterListeners()
         {
             if (chapterController != null)
             {
-                chapterController.PageTurnStateChanged -= HandlePageTurnStateChanged;
-                chapterController.PageTurnStateChanged += HandlePageTurnStateChanged;
+                chapterController.PageIndexChanged -= HandlePageIndexChanged;
+                chapterController.PageIndexChanged += HandlePageIndexChanged;
+                chapterController.FinalPageTurned -= HandleFinalPageTurned;
+                chapterController.FinalPageTurned += HandleFinalPageTurned;
             }
 
             if (watchTimeDisplay != null)
             {
-                watchTimeDisplay.DateChanged -= HandleDateChanged;
-                watchTimeDisplay.DateChanged += HandleDateChanged;
+                watchTimeDisplay.TimeChanged -= HandleTimeChanged;
+                watchTimeDisplay.TimeChanged += HandleTimeChanged;
             }
         }
 
-        private void HandlePageTurnStateChanged(bool isPageTurned)
+        private void HandlePageIndexChanged(int pageIndex)
         {
-            ApplyVisibility(isPageTurned);
+            ApplyVisibility();
+            UpdateControllerUnlock();
         }
 
-        private void HandleDateChanged(System.DateTime date)
+        private void HandleTimeChanged(TimeSpan time)
         {
-            if (chapterController == null || !chapterController.IsPageTurned || endingStarted)
+            if (chapterController == null || endingStarted)
             {
                 return;
             }
 
-            if (!ticketsUnlocked && weddingInvitation != null && weddingInvitation.MatchesTriggerDate(date))
+            if (chapterController.CurrentPageIndex == 1)
             {
-                ticketsUnlocked = true;
-                ApplyVisibility(true);
+                bool changed = false;
+                if (!memoDayDateCompleted && MatchesMemoDayTime(time))
+                {
+                    memoDayDateCompleted = true;
+                    changed = true;
+                }
+
+                if (memoDayDateCompleted && !movieTicketDateCompleted && MatchesMovieTicketTime(time))
+                {
+                    movieTicketDateCompleted = true;
+                    changed = true;
+                }
+
+                if (changed)
+                {
+                    ApplyVisibility();
+                    UpdateControllerUnlock();
+                }
+
                 return;
             }
 
-            if (!photoUnlocked && ticketsUnlocked && AnyTicketMatches(date))
+            if (chapterController.CurrentPageIndex == 2)
             {
-                photoUnlocked = true;
-                ApplyVisibility(true);
-                return;
-            }
+                bool changed = false;
+                if (!marriedPhotoDateCompleted && MatchesMarriedPhotoTime(time))
+                {
+                    marriedPhotoDateCompleted = true;
+                    changed = true;
+                }
 
-            if (photoUnlocked && marriedPhoto != null && marriedPhoto.MatchesTriggerDate(date))
-            {
-                StartCoroutine(PlayEndingVideoRoutine());
+                if (marriedPhotoDateCompleted && !weddingInvitationDateCompleted && MatchesWeddingInvitationTime(time))
+                {
+                    weddingInvitationDateCompleted = true;
+                    changed = true;
+                }
+
+                if (changed)
+                {
+                    ApplyVisibility();
+                    UpdateControllerUnlock();
+                }
             }
         }
 
-        private bool AnyTicketMatches(System.DateTime date)
+        private void HandleFinalPageTurned()
         {
-            if (movieTickets == null)
+            StartCoroutine(PlayEndingVideoRoutine());
+        }
+
+        private bool MatchesMemoDayTime(TimeSpan time)
+        {
+            return MatchesGateItem(memoDayDateGateItem, time) || MatchesClockTime(memoDayUnlockDate, time);
+        }
+
+        private bool MatchesMovieTicketTime(TimeSpan time)
+        {
+            return MatchesAnyGateItem(movieTickets, time) || MatchesClockTime(movieTicketUnlockDate, time);
+        }
+
+        private bool MatchesWeddingInvitationTime(TimeSpan time)
+        {
+            return MatchesGateItem(weddingInvitationDateGateItem, time) || MatchesClockTime(weddingInvitationUnlockDate, time);
+        }
+
+        private bool MatchesMarriedPhotoTime(TimeSpan time)
+        {
+            return MatchesGateItem(marriedPhotoDateGateItem, time) || MatchesClockTime(marriedPhotoEndingDate, time);
+        }
+
+        private static bool MatchesGateItem(ChapterOnePageItem item, TimeSpan time)
+        {
+            return item != null && item.MatchesTriggerTime(time);
+        }
+
+        private static bool MatchesAnyGateItem(ChapterOnePageItem[] items, TimeSpan time)
+        {
+            if (items == null)
             {
                 return false;
             }
 
-            for (int i = 0; i < movieTickets.Length; i++)
+            for (int i = 0; i < items.Length; i++)
             {
-                if (movieTickets[i] != null && movieTickets[i].MatchesTriggerDate(date))
+                if (MatchesGateItem(items[i], time))
                 {
                     return true;
                 }
@@ -122,20 +256,51 @@ namespace Arendalle
             return false;
         }
 
-        private void ApplyVisibility(bool isPageTurned)
+        private static bool MatchesClockTime(string value, TimeSpan time)
         {
-            SetItemVisible(weddingInvitation, isPageTurned);
+            return TryParseClockTime(value, out TimeSpan targetTime)
+                && targetTime.Hours == time.Hours
+                && targetTime.Minutes == time.Minutes;
+        }
 
-            bool showTickets = isPageTurned && ticketsUnlocked;
-            if (movieTickets != null)
+        private void ApplyVisibility()
+        {
+            int pageIndex = chapterController != null ? chapterController.CurrentPageIndex : 0;
+            bool showFirstPage = pageIndex == 1;
+            bool showSecondPage = pageIndex == 2;
+            bool showMovieTickets = showFirstPage && memoDayDateCompleted;
+            bool showWeddingInvitation = showSecondPage && marriedPhotoDateCompleted;
+
+            SetItemVisible(memoDay, showFirstPage);
+            SetItemsVisible(movieTickets, showMovieTickets);
+            SetTextVisible(firstPageText, showFirstPage);
+            SetTextVisible(ticketCaptionText, showFirstPage);
+
+            SetItemVisible(marriedPhoto, showSecondPage);
+            SetItemVisible(weddingInvitation, showWeddingInvitation);
+            SetTextVisible(secondPageText, showSecondPage);
+        }
+
+        private void UpdateControllerUnlock()
+        {
+            if (chapterController != null)
             {
-                for (int i = 0; i < movieTickets.Length; i++)
-                {
-                    SetItemVisible(movieTickets[i], showTickets);
-                }
+                chapterController.SetSecondPageUnlocked(memoDayDateCompleted && movieTicketDateCompleted);
+                chapterController.SetFinalPageUnlocked(marriedPhotoDateCompleted && weddingInvitationDateCompleted);
+            }
+        }
+
+        private static void SetItemsVisible(ChapterOnePageItem[] items, bool visible)
+        {
+            if (items == null)
+            {
+                return;
             }
 
-            SetItemVisible(marriedPhoto, isPageTurned && photoUnlocked);
+            for (int i = 0; i < items.Length; i++)
+            {
+                SetItemVisible(items[i], visible);
+            }
         }
 
         private static void SetItemVisible(ChapterOnePageItem item, bool visible)
@@ -144,6 +309,68 @@ namespace Arendalle
             {
                 item.SetVisible(visible);
             }
+        }
+
+        private static void SetTextVisible(Text text, bool visible)
+        {
+            if (text != null)
+            {
+                text.gameObject.SetActive(visible);
+            }
+        }
+
+        private static ChapterOnePageItem FindPageItem(string objectName)
+        {
+            ChapterOnePageItem[] items = Resources.FindObjectsOfTypeAll<ChapterOnePageItem>();
+            for (int i = 0; i < items.Length; i++)
+            {
+                if (items[i] != null && items[i].name == objectName)
+                {
+                    return items[i];
+                }
+            }
+
+            return null;
+        }
+
+        private static Text FindText(string objectName)
+        {
+            Text[] texts = Resources.FindObjectsOfTypeAll<Text>();
+            for (int i = 0; i < texts.Length; i++)
+            {
+                if (texts[i] != null && texts[i].name == objectName)
+                {
+                    return texts[i];
+                }
+            }
+
+            return null;
+        }
+
+        private static bool TryParseClockTime(string value, out TimeSpan parsedTime)
+        {
+            parsedTime = default;
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                return false;
+            }
+
+            string[] parts = value.Trim().Split(':', '.');
+            if (parts.Length != 2
+                || parts[0].Length != 2
+                || parts[1].Length != 2
+                || !int.TryParse(parts[0], out int hour)
+                || !int.TryParse(parts[1], out int minute)
+                || hour < 0
+                || hour > 23
+                || minute < 0
+                || minute > 59)
+            {
+                return false;
+            }
+
+            parsedTime = new TimeSpan(hour, minute, 0);
+            return true;
         }
 
         private IEnumerator PlayEndingVideoRoutine()

@@ -23,7 +23,7 @@ namespace Arendalle
         [SerializeField] private Vector3 detailEulerAngles;
 
         [Header("Flow")]
-        [SerializeField] private string triggerDate = "26.11.22";
+        [SerializeField] private string triggerDate = "11:22";
 
         private bool showingBack;
 
@@ -59,9 +59,9 @@ namespace Arendalle
             }
         }
 
-        public bool MatchesTriggerDate(DateTime date)
+        public bool MatchesTriggerTime(TimeSpan time)
         {
-            return TryParseShortDate(triggerDate, out DateTime targetDate) && date.Date == targetDate.Date;
+            return TryParseClockTime(triggerDate, out TimeSpan targetTime) && IsSameMinute(time, targetTime);
         }
 
         public void ResetDetailSide()
@@ -126,37 +126,35 @@ namespace Arendalle
             sceneImage.raycastTarget = true;
         }
 
-        private static bool TryParseShortDate(string value, out DateTime parsedDate)
+        private static bool IsSameMinute(TimeSpan first, TimeSpan second)
         {
-            parsedDate = default;
+            return first.Hours == second.Hours && first.Minutes == second.Minutes;
+        }
+
+        private static bool TryParseClockTime(string value, out TimeSpan parsedTime)
+        {
+            parsedTime = default;
             if (string.IsNullOrWhiteSpace(value))
             {
                 return false;
             }
 
-            string[] parts = value.Trim().Split('.');
-            if (parts.Length != 3
-                || !int.TryParse(parts[0], out int year)
-                || !int.TryParse(parts[1], out int month)
-                || !int.TryParse(parts[2], out int day))
+            string[] parts = value.Trim().Split(':', '.');
+            if (parts.Length != 2
+                || parts[0].Length != 2
+                || parts[1].Length != 2
+                || !int.TryParse(parts[0], out int hour)
+                || !int.TryParse(parts[1], out int minute)
+                || hour < 0
+                || hour > 23
+                || minute < 0
+                || minute > 59)
             {
                 return false;
             }
 
-            if (parts[0].Length == 2)
-            {
-                year += 2000;
-            }
-
-            try
-            {
-                parsedDate = new DateTime(year, month, day);
-                return true;
-            }
-            catch (ArgumentOutOfRangeException)
-            {
-                return false;
-            }
+            parsedTime = new TimeSpan(hour, minute, 0);
+            return true;
         }
     }
 }
