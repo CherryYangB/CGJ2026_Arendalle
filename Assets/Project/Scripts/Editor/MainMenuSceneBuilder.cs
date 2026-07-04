@@ -19,6 +19,12 @@ namespace Arendalle.EditorTools
         private const string ChapterScenePath = "Assets/Project/Scenes/Chapter_1.unity";
         private const string BorderSpritePath = "Assets/Project/Art/UI/HomeMenuBorder.png";
         private const string ButtonSpritePath = "Assets/Project/Art/UI/HandDrawnButton.png";
+        private const string ChapterBackgroundSpritePath = "Assets/Project/Art/Background/bg_bg_s1_v1.png";
+        private const string MemoHomeSpritePath = "Assets/Project/Art/Background/bg_memo_home.png";
+        private const string MemoPageOneSpritePath = "Assets/Project/Art/Background/bg_memo_page_1.png";
+        private const string TodoListSpritePath = "Assets/Project/Art/Sprites/todo_list.png";
+        private const string BlueBarcodeCardSpritePath = "Assets/Project/Art/Sprites/blue_barcode_card.png";
+        private const string YellowNoteClipSpritePath = "Assets/Project/Art/Sprites/yellow_note_clip.png";
         private const string AutoRunRequestPath = "Temp/RebuildHomeMenu.request";
 
         static MainMenuSceneBuilder()
@@ -31,13 +37,14 @@ namespace Arendalle.EditorTools
         {
             EnsureFolders();
             CreateUiSprites();
+            EnsureChapterSprites();
             BuildHomeScene();
             BuildChapterScene();
             UpdateBuildSettings();
 
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
-            Debug.Log("Home menu scene rebuilt.");
+            Debug.Log("Project scenes rebuilt.");
         }
 
         private static void RunPendingRebuildRequest()
@@ -89,6 +96,62 @@ namespace Arendalle.EditorTools
         {
             CreateBorderSprite(BorderSpritePath, ReferenceWidth, ReferenceHeight);
             CreateButtonSprite(ButtonSpritePath, 560, 148);
+        }
+
+        private static void EnsureChapterSprites()
+        {
+            EnsureSpriteImport(ChapterBackgroundSpritePath);
+            EnsureSpriteImport(MemoHomeSpritePath);
+            EnsureSpriteImport(MemoPageOneSpritePath);
+            EnsureSpriteImport(TodoListSpritePath);
+            EnsureSpriteImport(BlueBarcodeCardSpritePath);
+            EnsureSpriteImport(YellowNoteClipSpritePath);
+        }
+
+        private static void EnsureSpriteImport(string assetPath)
+        {
+            TextureImporter importer = AssetImporter.GetAtPath(assetPath) as TextureImporter;
+            if (importer == null)
+            {
+                Debug.LogWarning($"Sprite source not found: {assetPath}");
+                return;
+            }
+
+            bool changed = false;
+            if (importer.textureType != TextureImporterType.Sprite)
+            {
+                importer.textureType = TextureImporterType.Sprite;
+                changed = true;
+            }
+
+            if (importer.spriteImportMode != SpriteImportMode.Single)
+            {
+                importer.spriteImportMode = SpriteImportMode.Single;
+                changed = true;
+            }
+
+            if (!importer.alphaIsTransparency)
+            {
+                importer.alphaIsTransparency = true;
+                changed = true;
+            }
+
+            if (importer.mipmapEnabled)
+            {
+                importer.mipmapEnabled = false;
+                changed = true;
+            }
+
+            if (!Mathf.Approximately(importer.spritePixelsPerUnit, 100f))
+            {
+                importer.spritePixelsPerUnit = 100f;
+                changed = true;
+            }
+
+            if (changed)
+            {
+                importer.SaveAndReimport();
+            }
         }
 
         private static void CreateBorderSprite(string assetPath, int width, int height)
@@ -382,10 +445,16 @@ namespace Arendalle.EditorTools
         {
             Scene scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
 
-            CreateCamera(new Color(0.88f, 0.9f, 0.94f, 1f));
+            CreateCamera(Color.white);
             CreateEventSystem();
 
-            Font font = GetDefaultFont();
+            Sprite backgroundSprite = AssetDatabase.LoadAssetAtPath<Sprite>(ChapterBackgroundSpritePath);
+            Sprite memoHomeSprite = AssetDatabase.LoadAssetAtPath<Sprite>(MemoHomeSpritePath);
+            Sprite memoPageOneSprite = AssetDatabase.LoadAssetAtPath<Sprite>(MemoPageOneSpritePath);
+            Sprite todoListSprite = AssetDatabase.LoadAssetAtPath<Sprite>(TodoListSpritePath);
+            Sprite blueBarcodeCardSprite = AssetDatabase.LoadAssetAtPath<Sprite>(BlueBarcodeCardSpritePath);
+            Sprite yellowNoteClipSprite = AssetDatabase.LoadAssetAtPath<Sprite>(YellowNoteClipSpritePath);
+
             GameObject canvasObject = new GameObject("ChapterCanvas", typeof(RectTransform), typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
             Canvas canvas = canvasObject.GetComponent<Canvas>();
             canvas.renderMode = RenderMode.ScreenSpaceOverlay;
@@ -393,11 +462,78 @@ namespace Arendalle.EditorTools
             CanvasScaler scaler = canvasObject.GetComponent<CanvasScaler>();
             scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
             scaler.referenceResolution = new Vector2(ReferenceWidth, ReferenceHeight);
+            scaler.screenMatchMode = CanvasScaler.ScreenMatchMode.MatchWidthOrHeight;
             scaler.matchWidthOrHeight = 0.5f;
 
-            Text title = CreateText("ChapterTitle", canvasObject.transform, "Chapter_1", font, 82, TextAnchor.MiddleCenter);
-            title.color = new Color(0.08f, 0.08f, 0.1f, 1f);
-            SetRect(title.rectTransform, new Vector2(0.5f, 0.5f), new Vector2(900f, 180f));
+            Image background = CreateImage("Background", canvasObject.transform, backgroundSprite, Color.white);
+            Stretch(background.rectTransform);
+            background.raycastTarget = false;
+
+            GameObject memoRoot = CreateUiObject("MemoRoot", canvasObject.transform);
+            SetRect(memoRoot.GetComponent<RectTransform>(), new Vector2(0.5f, 0.5f), new Vector2(1672f, 941f));
+
+            Image memoHome = CreateImage("MemoHome", memoRoot.transform, memoHomeSprite, Color.white);
+            Stretch(memoHome.rectTransform);
+            memoHome.raycastTarget = false;
+
+            Image incomingPage = CreateImage("IncomingPage", memoRoot.transform, memoPageOneSprite, new Color(1f, 1f, 1f, 0f));
+            Stretch(incomingPage.rectTransform);
+            incomingPage.raycastTarget = false;
+            incomingPage.gameObject.SetActive(false);
+
+            GameObject itemRoot = CreateUiObject("MemoItems", memoRoot.transform);
+            Stretch(itemRoot.GetComponent<RectTransform>());
+            CanvasGroup itemGroup = itemRoot.AddComponent<CanvasGroup>();
+            itemGroup.alpha = 1f;
+            itemGroup.interactable = true;
+            itemGroup.blocksRaycasts = true;
+
+            Button todoListButton = CreateClickableImage(
+                "TodoList",
+                itemRoot.transform,
+                todoListSprite,
+                new Vector2(-508f, 300f),
+                new Vector2(390f, 246f));
+
+            Button blueBarcodeCardButton = CreateClickableImage(
+                "BlueBarcodeCard",
+                itemRoot.transform,
+                blueBarcodeCardSprite,
+                new Vector2(-520f, 75f),
+                new Vector2(350f, 263f));
+
+            Button yellowNoteClipButton = CreateClickableImage(
+                "YellowNoteClip",
+                itemRoot.transform,
+                yellowNoteClipSprite,
+                new Vector2(-490f, -185f),
+                new Vector2(392f, 377f));
+
+            Image pageTurnHighlight = CreateImage("PageTurnHighlight", memoRoot.transform, null, new Color(1f, 1f, 1f, 0f));
+            SetRect(pageTurnHighlight.rectTransform, new Vector2(0.5f, 0.5f), new Vector2(64f, 820f), new Vector2(575f, 0f));
+            pageTurnHighlight.raycastTarget = false;
+            pageTurnHighlight.gameObject.SetActive(false);
+
+            Image pageEdgeHotspotImage = CreateImage("PageEdgeHotspot", memoRoot.transform, null, new Color(1f, 1f, 1f, 0f));
+            SetRect(pageEdgeHotspotImage.rectTransform, new Vector2(0.5f, 0.5f), new Vector2(170f, 760f), new Vector2(575f, 0f));
+            pageEdgeHotspotImage.raycastTarget = true;
+
+            Button pageEdgeButton = AddInvisibleButton(pageEdgeHotspotImage);
+
+            GameObject controllerObject = new GameObject("ChapterOneController");
+            ChapterOneController controller = controllerObject.AddComponent<ChapterOneController>();
+            ConfigureChapterOneController(
+                controller,
+                memoHome,
+                memoHomeSprite,
+                memoPageOneSprite,
+                incomingPage,
+                pageTurnHighlight,
+                pageEdgeButton,
+                itemGroup,
+                todoListButton,
+                blueBarcodeCardButton,
+                yellowNoteClipButton);
 
             EditorSceneManager.SaveScene(scene, ChapterScenePath);
         }
@@ -475,6 +611,24 @@ namespace Arendalle.EditorTools
             return button;
         }
 
+        private static Button CreateClickableImage(string name, Transform parent, Sprite sprite, Vector2 anchoredPosition, Vector2 size)
+        {
+            Image image = CreateImage(name, parent, sprite, Color.white);
+            SetRect(image.rectTransform, new Vector2(0.5f, 0.5f), size, anchoredPosition);
+            image.preserveAspect = true;
+            image.raycastTarget = true;
+
+            return AddInvisibleButton(image);
+        }
+
+        private static Button AddInvisibleButton(Image image)
+        {
+            Button button = image.gameObject.AddComponent<Button>();
+            button.targetGraphic = image;
+            button.transition = Selectable.Transition.None;
+            return button;
+        }
+
         private static GameObject CreateUiObject(string name, Transform parent)
         {
             GameObject gameObject = new GameObject(name, typeof(RectTransform));
@@ -495,11 +649,16 @@ namespace Arendalle.EditorTools
 
         private static void SetRect(RectTransform rectTransform, Vector2 normalizedAnchor, Vector2 size)
         {
+            SetRect(rectTransform, normalizedAnchor, size, Vector2.zero);
+        }
+
+        private static void SetRect(RectTransform rectTransform, Vector2 normalizedAnchor, Vector2 size, Vector2 anchoredPosition)
+        {
             rectTransform.anchorMin = normalizedAnchor;
             rectTransform.anchorMax = normalizedAnchor;
             rectTransform.pivot = new Vector2(0.5f, 0.5f);
             rectTransform.sizeDelta = size;
-            rectTransform.anchoredPosition = Vector2.zero;
+            rectTransform.anchoredPosition = anchoredPosition;
             rectTransform.localScale = Vector3.one;
         }
 
@@ -538,6 +697,40 @@ namespace Arendalle.EditorTools
             serializedObject.FindProperty("aboutFadeDuration").floatValue = 0.9f;
             serializedObject.FindProperty("aboutHoldDuration").floatValue = 4f;
             serializedObject.FindProperty("musicSource").objectReferenceValue = musicSource;
+            serializedObject.ApplyModifiedPropertiesWithoutUndo();
+        }
+
+        private static void ConfigureChapterOneController(
+            ChapterOneController controller,
+            Image memoImage,
+            Sprite memoHomeSprite,
+            Sprite memoPageOneSprite,
+            Image incomingPageImage,
+            Image pageTurnHighlight,
+            Button pageEdgeButton,
+            CanvasGroup itemGroup,
+            Button todoListButton,
+            Button blueBarcodeCardButton,
+            Button yellowNoteClipButton)
+        {
+            SerializedObject serializedObject = new SerializedObject(controller);
+            serializedObject.FindProperty("memoImage").objectReferenceValue = memoImage;
+            serializedObject.FindProperty("memoHomeSprite").objectReferenceValue = memoHomeSprite;
+            serializedObject.FindProperty("memoPageOneSprite").objectReferenceValue = memoPageOneSprite;
+            serializedObject.FindProperty("incomingPageImage").objectReferenceValue = incomingPageImage;
+            serializedObject.FindProperty("pageTurnHighlight").objectReferenceValue = pageTurnHighlight;
+            serializedObject.FindProperty("pageEdgeButton").objectReferenceValue = pageEdgeButton;
+            serializedObject.FindProperty("itemGroup").objectReferenceValue = itemGroup;
+            serializedObject.FindProperty("todoListButton").objectReferenceValue = todoListButton;
+            serializedObject.FindProperty("todoListTransform").objectReferenceValue = todoListButton.GetComponent<RectTransform>();
+            serializedObject.FindProperty("blueBarcodeCardButton").objectReferenceValue = blueBarcodeCardButton;
+            serializedObject.FindProperty("blueBarcodeCardTransform").objectReferenceValue = blueBarcodeCardButton.GetComponent<RectTransform>();
+            serializedObject.FindProperty("yellowNoteClipButton").objectReferenceValue = yellowNoteClipButton;
+            serializedObject.FindProperty("yellowNoteClipTransform").objectReferenceValue = yellowNoteClipButton.GetComponent<RectTransform>();
+            serializedObject.FindProperty("itemShakeDuration").floatValue = 0.18f;
+            serializedObject.FindProperty("itemShakePixels").floatValue = 8f;
+            serializedObject.FindProperty("itemShakeDegrees").floatValue = 1.8f;
+            serializedObject.FindProperty("pageTurnDuration").floatValue = 0.68f;
             serializedObject.ApplyModifiedPropertiesWithoutUndo();
         }
 
