@@ -321,6 +321,7 @@ GameObject:
   - component: {fileID: 218481808}
   - component: {fileID: 218481807}
   - component: {fileID: 218481809}
+  - component: {fileID: 218481810}
   m_Layer: 0
   m_Name: StartButton
   m_TagString: Untagged
@@ -431,6 +432,23 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &218481810
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 218481805}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7f8d2c0e9a5b4b2caf3d1e6a9b0c4d8e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  clickAudioClip: {fileID: 8300000, guid: 888d306c91508f645a0b4fa6fff60c12, type: 3}
+  audioSource: {fileID: 0}
+  volume: 1
+  requireInteractable: 1
+  leftMouseButtonOnly: 1
 --- !u!1 &336394437
 GameObject:
   m_ObjectHideFlags: 0
@@ -557,7 +575,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 1
     m_LineSpacing: 1.12
-  m_Text: "\u5173\u4E8E\n\n\u8FD9\u91CC\u662F\u6587\u672C\u4FE1\u606F\u5360\u4F4D\u3002\n\u53EF\u4EE5\u66FF\u6362\u4E3A\u5236\u4F5C\u7EC4\u3001\u5267\u60C5\u7B80\u4ECB\u6216\u64CD\u4F5C\u8BF4\u660E\u3002\n\n\u611F\u8C22\u6E38\u73A9\u3002"
+  m_Text: "\u5173\u4E8E\n\n\u8FD9\u91CC\u662F\u6587\u672C\u4FE1\u606F\u5360\u4F4D\u3002\n\u53EF\u4EE5\u66FF\u6362\u4E3A\u5236\u4F5C\u7EC4\u3001\u5267\u60C5\u7B80\u4ECB\u6216\u64CD\u4F5C\u8BF4\u660E\u3002\n\n\u611F\u8C22\u6E38\u73A9\u3002\u6309esc\u56DE\u5230\u4E3B\u9875\u9762\u3002"
 --- !u!222 &437478188
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -814,6 +832,7 @@ GameObject:
   - component: {fileID: 1015451286}
   - component: {fileID: 1015451285}
   - component: {fileID: 1015451287}
+  - component: {fileID: 1015451288}
   m_Layer: 0
   m_Name: AboutButton
   m_TagString: Untagged
@@ -924,6 +943,23 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &1015451288
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1015451283}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7f8d2c0e9a5b4b2caf3d1e6a9b0c4d8e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  clickAudioClip: {fileID: 8300000, guid: 888d306c91508f645a0b4fa6fff60c12, type: 3}
+  audioSource: {fileID: 0}
+  volume: 1
+  requireInteractable: 1
+  leftMouseButtonOnly: 1
 --- !u!1 &1024305153
 GameObject:
   m_ObjectHideFlags: 0
@@ -1255,7 +1291,7 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 8300000, guid: 821c32e3eaa205a448fba1d7a1e6b5e0, type: 3}
+  m_audioClip: {fileID: 8300000, guid: 6bbcbdbd2188e4852b11287b993b8c21, type: 3}
   m_PlayOnAwake: 1
   m_Volume: 1
   m_Pitch: 1
@@ -1667,6 +1703,7 @@ GameObject:
   - component: {fileID: 1974236492}
   - component: {fileID: 1974236491}
   - component: {fileID: 1974236493}
+  - component: {fileID: 1974236494}
   m_Layer: 0
   m_Name: QuitButton
   m_TagString: Untagged
@@ -1777,3 +1814,20 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &1974236494
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1974236489}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7f8d2c0e9a5b4b2caf3d1e6a9b0c4d8e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  clickAudioClip: {fileID: 8300000, guid: 888d306c91508f645a0b4fa6fff60c12, type: 3}
+  audioSource: {fileID: 0}
+  volume: 1
+  requireInteractable: 1
+  leftMouseButtonOnly: 1

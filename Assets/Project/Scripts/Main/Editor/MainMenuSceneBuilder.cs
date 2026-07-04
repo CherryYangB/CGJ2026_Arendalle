@@ -20,6 +20,7 @@ namespace Arendalle.EditorTools
         private const string ChapterTwoScenePath = "Assets/Project/Scenes/Chapter_2.unity";
         private const string BorderSpritePath = "Assets/Project/Art/UI/HomeMenuBorder.png";
         private const string ButtonSpritePath = "Assets/Project/Art/UI/HandDrawnButton.png";
+        private const string ClickAudioPath = "Assets/Project/Audio/Click,.wav";
         private const string ChapterBackgroundSpritePath = "Assets/Project/Art/Background/bg_bg_s1_v1.png";
         private const string MemoHomeSpritePath = "Assets/Project/Art/Background/bg_memo_home.png";
         private const string MemoPageOneSpritePath = "Assets/Project/Art/Background/bg_memo_page_1.png";
@@ -393,6 +394,7 @@ namespace Arendalle.EditorTools
 
             Sprite borderSprite = AssetDatabase.LoadAssetAtPath<Sprite>(BorderSpritePath);
             Sprite buttonSprite = AssetDatabase.LoadAssetAtPath<Sprite>(ButtonSpritePath);
+            AudioClip clickAudioClip = AssetDatabase.LoadAssetAtPath<AudioClip>(ClickAudioPath);
             Font font = GetDefaultFont();
 
             GameObject canvasObject = new GameObject("HomeMenuCanvas", typeof(RectTransform), typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
@@ -426,6 +428,9 @@ namespace Arendalle.EditorTools
             Button startButton = CreateButton("StartButton", homeRoot.transform, "开始", buttonSprite, font, new Vector2(0.29f, 0.47f));
             Button quitButton = CreateButton("QuitButton", homeRoot.transform, "退出游戏", buttonSprite, font, new Vector2(0.29f, 0.32f));
             Button aboutButton = CreateButton("AboutButton", homeRoot.transform, "关于", buttonSprite, font, new Vector2(0.29f, 0.18f));
+            AddButtonClickSound(startButton, clickAudioClip);
+            AddButtonClickSound(quitButton, clickAudioClip);
+            AddButtonClickSound(aboutButton, clickAudioClip);
 
             GameObject aboutRoot = CreateUiObject("AboutRoot", canvasObject.transform);
             Stretch(aboutRoot.GetComponent<RectTransform>());
@@ -1049,7 +1054,28 @@ namespace Arendalle.EditorTools
             serializedObject.FindProperty("transitionTextHoldDuration").floatValue = 0.8f;
             serializedObject.FindProperty("transitionTextFadeOutDuration").floatValue = 0.75f;
             serializedObject.FindProperty("aboutFadeDuration").floatValue = 0.9f;
-            serializedObject.FindProperty("musicSource").objectReferenceValue = musicSource;
+            serializedObject.ApplyModifiedPropertiesWithoutUndo();
+        }
+
+        private static void AddButtonClickSound(Button button, AudioClip clickAudioClip)
+        {
+            if (button == null)
+            {
+                return;
+            }
+
+            ButtonClickSound clickSound = button.GetComponent<ButtonClickSound>();
+            if (clickSound == null)
+            {
+                clickSound = button.gameObject.AddComponent<ButtonClickSound>();
+            }
+
+            SerializedObject serializedObject = new SerializedObject(clickSound);
+            serializedObject.FindProperty("clickAudioClip").objectReferenceValue = clickAudioClip;
+            serializedObject.FindProperty("audioSource").objectReferenceValue = null;
+            serializedObject.FindProperty("volume").floatValue = 1f;
+            serializedObject.FindProperty("requireInteractable").boolValue = true;
+            serializedObject.FindProperty("leftMouseButtonOnly").boolValue = true;
             serializedObject.ApplyModifiedPropertiesWithoutUndo();
         }
 
