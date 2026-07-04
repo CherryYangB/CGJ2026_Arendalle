@@ -13,7 +13,22 @@
 *.userprefs
 *.vscode/
 .idea/
+.vs/
 
 # Windows
 Thumbs.db
 *.tmp
+
+# TextMeshPro 示例和文档（不需要提交，体积大且无用）
+Assets/TextMeshPro/Documentation/
+Assets/TextMeshPro/Examples & Extras/
+
+# 操作系统杂项
+.DS_Store
+*.bak
+
+# 大文件格式（配合 Git LFS 使用，建议直接用 LFS 管理）
+# *.psd
+# *.wav
+# *.mp3
+# *.fbx
