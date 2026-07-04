@@ -437,15 +437,23 @@ namespace Arendalle.EditorTools
             whiteFade.color = fadeColor;
             whiteFade.raycastTarget = false;
 
+            Text transitionText = CreateText("TransitionText", canvasObject.transform, string.Empty, font, 48, TextAnchor.MiddleCenter);
+            transitionText.color = new Color(0.02f, 0.02f, 0.02f, 1f);
+            SetRect(transitionText.rectTransform, new Vector2(0.5f, 0.5f), new Vector2(1180f, 180f));
+            CanvasGroup transitionTextGroup = transitionText.gameObject.AddComponent<CanvasGroup>();
+            transitionTextGroup.alpha = 0f;
+            transitionTextGroup.interactable = false;
+            transitionTextGroup.blocksRaycasts = false;
+
             GameObject musicObject = new GameObject("MusicLoopPlaceholder", typeof(AudioSource));
             AudioSource musicSource = musicObject.GetComponent<AudioSource>();
             musicSource.loop = true;
-            musicSource.playOnAwake = true;
+            musicSource.playOnAwake = false;
             musicSource.volume = 0.55f;
 
             GameObject controllerObject = new GameObject("MainMenuController");
             MainMenuController controller = controllerObject.AddComponent<MainMenuController>();
-            ConfigureController(controller, startButton, quitButton, aboutButton, homeGroup, aboutGroup, whiteFade, musicSource);
+            ConfigureController(controller, startButton, quitButton, aboutButton, homeGroup, aboutGroup, whiteFade, transitionTextGroup, transitionText, musicSource);
 
             EditorSceneManager.SaveScene(scene, HomeScenePath);
         }
@@ -844,6 +852,8 @@ namespace Arendalle.EditorTools
             CanvasGroup homeGroup,
             CanvasGroup aboutGroup,
             Image whiteFade,
+            CanvasGroup transitionTextGroup,
+            Text transitionText,
             AudioSource musicSource)
         {
             SerializedObject serializedObject = new SerializedObject(controller);
@@ -854,7 +864,13 @@ namespace Arendalle.EditorTools
             serializedObject.FindProperty("homeGroup").objectReferenceValue = homeGroup;
             serializedObject.FindProperty("aboutGroup").objectReferenceValue = aboutGroup;
             serializedObject.FindProperty("whiteFade").objectReferenceValue = whiteFade;
+            serializedObject.FindProperty("transitionTextGroup").objectReferenceValue = transitionTextGroup;
+            serializedObject.FindProperty("transitionText").objectReferenceValue = transitionText;
+            serializedObject.FindProperty("transitionMessage").stringValue = string.Empty;
+            serializedObject.FindProperty("transitionMessage2").stringValue = string.Empty;
             serializedObject.FindProperty("sceneFadeDuration").floatValue = 1.15f;
+            serializedObject.FindProperty("transitionTextHoldDuration").floatValue = 0.8f;
+            serializedObject.FindProperty("transitionTextFadeOutDuration").floatValue = 0.75f;
             serializedObject.FindProperty("aboutFadeDuration").floatValue = 0.9f;
             serializedObject.FindProperty("musicSource").objectReferenceValue = musicSource;
             serializedObject.ApplyModifiedPropertiesWithoutUndo();
