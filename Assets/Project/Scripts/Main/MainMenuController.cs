@@ -32,9 +32,6 @@ namespace Arendalle
         [SerializeField] private float transitionTextFadeOutDuration = 0.75f;
         [SerializeField] private float aboutFadeDuration = 0.9f;
 
-        [Header("Music Placeholder")]
-        [SerializeField] private AudioSource musicSource;
-        [SerializeField] private AudioClip musicClip;
 
         [Header("Text")]
         [SerializeField] private string[] preferredFontNames =
@@ -83,7 +80,6 @@ namespace Arendalle
             SetFadeAlpha(0f);
             SetTransitionTextAlpha(0f);
             SetTransitionMessage(string.Empty);
-            PrepareMusic();
         }
 
         private void OnDestroy()
@@ -161,26 +157,6 @@ namespace Arendalle
             StartExclusiveRoutine(HideAboutRoutine());
         }
 
-        private void PrepareMusic()
-        {
-            if (musicSource == null)
-            {
-                return;
-            }
-
-            musicSource.loop = true;
-            musicSource.playOnAwake = false;
-
-            if (musicClip != null)
-            {
-                musicSource.clip = musicClip;
-            }
-
-            if (musicSource.isPlaying)
-            {
-                musicSource.Stop();
-            }
-        }
 
         private void StartExclusiveRoutine(IEnumerator routine)
         {
@@ -195,7 +171,6 @@ namespace Arendalle
         private IEnumerator FadeToWhiteAndLoad()
         {
             SetMenuInteractable(false);
-            StopTransitionMusic();
             BringTransitionTextToFront();
 
             float elapsed = 0f;
@@ -333,9 +308,7 @@ namespace Arendalle
                 yield return FadeTransitionText(0f, 1f, sceneFadeDuration);
             }
 
-            PlayTransitionMusic();
             yield return HoldTransitionText();
-            StopTransitionMusic();
             yield return FadeTransitionText(1f, 0f, transitionTextFadeOutDuration);
         }
 
@@ -407,22 +380,6 @@ namespace Arendalle
             if (transitionText != null)
             {
                 transitionText.transform.SetAsLastSibling();
-            }
-        }
-
-        private void PlayTransitionMusic()
-        {
-            if (musicSource != null && musicSource.clip != null)
-            {
-                musicSource.Play();
-            }
-        }
-
-        private void StopTransitionMusic()
-        {
-            if (musicSource != null && musicSource.isPlaying)
-            {
-                musicSource.Stop();
             }
         }
     }
