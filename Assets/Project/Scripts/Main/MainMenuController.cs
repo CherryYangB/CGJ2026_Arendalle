@@ -21,7 +21,15 @@ namespace Arendalle
 
         [Header("Transition")]
         [SerializeField] private Image whiteFade;
+        [SerializeField] private CanvasGroup transitionTextGroup;
+        [SerializeField] private Text transitionText;
+        [TextArea]
+        [SerializeField] private string transitionMessage = "";
+        [TextArea]
+        [SerializeField] private string transitionMessage2 = "";
         [SerializeField] private float sceneFadeDuration = 1.15f;
+        [SerializeField] private float transitionTextHoldDuration = 0.8f;
+        [SerializeField] private float transitionTextFadeOutDuration = 0.75f;
         [SerializeField] private float aboutFadeDuration = 0.9f;
 
         [Header("Music Placeholder")]
@@ -44,6 +52,7 @@ namespace Arendalle
 
         private void Awake()
         {
+            ResolveTransitionTextReferences();
             ApplyRuntimeFont();
 
             if (startButton != null)
@@ -72,6 +81,8 @@ namespace Arendalle
             }
 
             SetFadeAlpha(0f);
+            SetTransitionTextAlpha(0f);
+            SetTransitionMessage(string.Empty);
             PrepareMusic();
         }
 
@@ -158,16 +169,16 @@ namespace Arendalle
             }
 
             musicSource.loop = true;
-            musicSource.playOnAwake = true;
+            musicSource.playOnAwake = false;
 
             if (musicClip != null)
             {
                 musicSource.clip = musicClip;
             }
 
-            if (musicSource.clip != null && !musicSource.isPlaying)
+            if (musicSource.isPlaying)
             {
-                musicSource.Play();
+                musicSource.Stop();
             }
         }
 
@@ -184,16 +195,23 @@ namespace Arendalle
         private IEnumerator FadeToWhiteAndLoad()
         {
             SetMenuInteractable(false);
+            StopTransitionMusic();
+            BringTransitionTextToFront();
 
             float elapsed = 0f;
             while (elapsed < sceneFadeDuration)
             {
                 elapsed += Time.unscaledDeltaTime;
-                SetFadeAlpha(Mathf.Clamp01(elapsed / sceneFadeDuration));
+                float alpha = Mathf.Clamp01(elapsed / sceneFadeDuration);
+                SetFadeAlpha(alpha);
+                SetTransitionTextAlpha(alpha);
                 yield return null;
             }
 
             SetFadeAlpha(1f);
+            yield return PlayTransitionStage(transitionMessage, true);
+            yield return PlayTransitionStage(transitionMessage2, false);
+
             SceneManager.LoadScene(chapterSceneName);
         }
 
@@ -287,6 +305,125 @@ namespace Arendalle
             color.a = alpha;
             whiteFade.color = color;
             whiteFade.raycastTarget = alpha > 0.01f;
+        }
+
+        private IEnumerator HoldTransitionText()
+        {
+            if (transitionTextHoldDuration > 0f)
+            {
+                yield return new WaitForSecondsRealtime(transitionTextHoldDuration);
+            }
+        }
+
+        private IEnumerator PlayTransitionStage(string message, bool includeFadeIn)
+        {
+            if (string.IsNullOrWhiteSpace(message))
+            {
+                yield break;
+            }
+
+            SetTransitionMessage(message);
+
+            if (includeFadeIn)
+            {
+                SetTransitionTextAlpha(1f);
+            }
+            else
+            {
+                yield return FadeTransitionText(0f, 1f, sceneFadeDuration);
+            }
+
+            PlayTransitionMusic();
+            yield return HoldTransitionText();
+            StopTransitionMusic();
+            yield return FadeTransitionText(1f, 0f, transitionTextFadeOutDuration);
+        }
+
+        private IEnumerator FadeTransitionText(float from, float to, float duration)
+        {
+            if (transitionTextGroup == null && transitionText == null)
+            {
+                yield break;
+            }
+
+            float elapsed = 0f;
+            SetTransitionTextAlpha(from);
+
+            while (elapsed < duration)
+            {
+                elapsed += Time.unscaledDeltaTime;
+                SetTransitionTextAlpha(Mathf.Lerp(from, to, Mathf.Clamp01(elapsed / duration)));
+                yield return null;
+            }
+
+            SetTransitionTextAlpha(to);
+        }
+
+        private void SetTransitionTextAlpha(float alpha)
+        {
+            if (transitionTextGroup != null)
+            {
+                transitionTextGroup.alpha = alpha;
+                transitionTextGroup.interactable = false;
+                transitionTextGroup.blocksRaycasts = false;
+            }
+
+            if (transitionText != null)
+            {
+                Color color = transitionText.color;
+                color.a = alpha;
+                transitionText.color = color;
+            }
+        }
+
+        private void SetTransitionMessage(string message)
+        {
+            if (transitionText != null)
+            {
+                transitionText.text = message;
+            }
+        }
+
+        private void ResolveTransitionTextReferences()
+        {
+            if (transitionText == null)
+            {
+                GameObject transitionObject = GameObject.Find("TransitionText");
+                if (transitionObject != null)
+                {
+                    transitionText = transitionObject.GetComponent<Text>();
+                    transitionTextGroup = transitionObject.GetComponent<CanvasGroup>();
+                }
+            }
+
+            if (transitionText != null && transitionTextGroup == null)
+            {
+                transitionTextGroup = transitionText.GetComponent<CanvasGroup>();
+            }
+        }
+
+        private void BringTransitionTextToFront()
+        {
+            if (transitionText != null)
+            {
+                transitionText.transform.SetAsLastSibling();
+            }
+        }
+
+        private void PlayTransitionMusic()
+        {
+            if (musicSource != null && musicSource.clip != null)
+            {
+                musicSource.Play();
+            }
+        }
+
+        private void StopTransitionMusic()
+        {
+            if (musicSource != null && musicSource.isPlaying)
+            {
+                musicSource.Stop();
+            }
         }
     }
 }

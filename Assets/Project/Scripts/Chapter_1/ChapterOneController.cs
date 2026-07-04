@@ -30,6 +30,9 @@ namespace Arendalle
         [SerializeField] private Sprite yellowNoteClipDetailSprite;
         [SerializeField] private string yellowNoteClipDetailText;
 
+        [Header("Watch")]
+        [SerializeField] private WatchTimeDisplay watchTimeDisplay;
+
         [Header("Detail Overlay")]
         [SerializeField] private CanvasGroup detailGroup;
         [SerializeField] private Button detailBackdropButton;
@@ -76,9 +79,9 @@ namespace Arendalle
                 itemGroup.blocksRaycasts = true;
             }
 
-            SetPageEdgeButtons(true, false);
-
             RegisterListeners();
+            RegisterWatchListeners();
+            SetPageEdgeButtons(CanTurnForwardPage(), false);
         }
 
         private void OnDestroy()
@@ -111,6 +114,11 @@ namespace Arendalle
             if (previousPageEdgeButton != null)
             {
                 previousPageEdgeButton.onClick.RemoveListener(TurnBackPage);
+            }
+
+            if (watchTimeDisplay != null)
+            {
+                watchTimeDisplay.FirstOpened -= HandleWatchFirstOpened;
             }
         }
 
@@ -145,6 +153,17 @@ namespace Arendalle
             {
                 previousPageEdgeButton.onClick.AddListener(TurnBackPage);
             }
+        }
+
+        private void RegisterWatchListeners()
+        {
+            if (watchTimeDisplay == null)
+            {
+                return;
+            }
+
+            watchTimeDisplay.FirstOpened -= HandleWatchFirstOpened;
+            watchTimeDisplay.FirstOpened += HandleWatchFirstOpened;
         }
 
         private void OpenTodoListDetail()
@@ -195,7 +214,7 @@ namespace Arendalle
 
         public void TurnPage()
         {
-            if (detailOpen || pageTurned || pageTurnRoutine != null)
+            if (detailOpen || pageTurned || pageTurnRoutine != null || IsWatchDetailOpen() || !HasWatchBeenOpened())
             {
                 return;
             }
@@ -205,7 +224,7 @@ namespace Arendalle
 
         public void TurnBackPage()
         {
-            if (detailOpen || !pageTurned || pageTurnRoutine != null)
+            if (detailOpen || !pageTurned || pageTurnRoutine != null || IsWatchDetailOpen())
             {
                 return;
             }
@@ -302,6 +321,7 @@ namespace Arendalle
         private IEnumerator TurnPageRoutine()
         {
             SetPageEdgeButtons(false, false);
+            SetWatchSceneInteractable(false);
 
             if (itemGroup != null)
             {
@@ -380,12 +400,14 @@ namespace Arendalle
 
             pageTurned = true;
             SetPageEdgeButtons(false, true);
+            SetWatchSceneInteractable(true);
             pageTurnRoutine = null;
         }
 
         private IEnumerator TurnBackPageRoutine()
         {
             SetPageEdgeButtons(false, false);
+            SetWatchSceneInteractable(false);
 
             if (itemGroup != null)
             {
@@ -466,8 +488,40 @@ namespace Arendalle
             }
 
             pageTurned = false;
-            SetPageEdgeButtons(true, false);
+            SetPageEdgeButtons(CanTurnForwardPage(), false);
+            SetWatchSceneInteractable(true);
             pageTurnRoutine = null;
+        }
+
+        private void HandleWatchFirstOpened()
+        {
+            if (!pageTurned && pageTurnRoutine == null)
+            {
+                SetPageEdgeButtons(CanTurnForwardPage(), false);
+            }
+        }
+
+        private bool IsWatchDetailOpen()
+        {
+            return watchTimeDisplay != null && watchTimeDisplay.IsDetailOpen;
+        }
+
+        private bool HasWatchBeenOpened()
+        {
+            return watchTimeDisplay == null || watchTimeDisplay.HasBeenOpened;
+        }
+
+        private bool CanTurnForwardPage()
+        {
+            return !pageTurned && HasWatchBeenOpened();
+        }
+
+        private void SetWatchSceneInteractable(bool interactable)
+        {
+            if (watchTimeDisplay != null)
+            {
+                watchTimeDisplay.SetSceneInteractable(interactable);
+            }
         }
 
         private void SetPageEdgeButtons(bool canTurnForward, bool canTurnBackward)
@@ -549,5 +603,6 @@ namespace Arendalle
             color.a = alpha;
             text.color = color;
         }
+
     }
 }
