@@ -454,6 +454,7 @@ namespace Arendalle.EditorTools
             Sprite todoListSprite = AssetDatabase.LoadAssetAtPath<Sprite>(TodoListSpritePath);
             Sprite blueBarcodeCardSprite = AssetDatabase.LoadAssetAtPath<Sprite>(BlueBarcodeCardSpritePath);
             Sprite yellowNoteClipSprite = AssetDatabase.LoadAssetAtPath<Sprite>(YellowNoteClipSpritePath);
+            Font font = GetDefaultFont();
 
             GameObject canvasObject = new GameObject("ChapterCanvas", typeof(RectTransform), typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
             Canvas canvas = canvasObject.GetComponent<Canvas>();
@@ -520,6 +521,35 @@ namespace Arendalle.EditorTools
 
             Button pageEdgeButton = AddInvisibleButton(pageEdgeHotspotImage);
 
+            Image previousPageEdgeHotspotImage = CreateImage("PreviousPageEdgeHotspot", memoRoot.transform, null, new Color(1f, 1f, 1f, 0f));
+            SetRect(previousPageEdgeHotspotImage.rectTransform, new Vector2(0.5f, 0.5f), new Vector2(170f, 760f), new Vector2(-575f, 0f));
+            previousPageEdgeHotspotImage.raycastTarget = true;
+
+            Button previousPageEdgeButton = AddInvisibleButton(previousPageEdgeHotspotImage);
+
+            GameObject detailRoot = CreateUiObject("DetailOverlay", canvasObject.transform);
+            Stretch(detailRoot.GetComponent<RectTransform>());
+            CanvasGroup detailGroup = detailRoot.AddComponent<CanvasGroup>();
+            detailGroup.alpha = 0f;
+            detailGroup.interactable = false;
+            detailGroup.blocksRaycasts = false;
+
+            Image detailBackdrop = CreateImage("DetailBackdrop", detailRoot.transform, null, new Color(0f, 0f, 0f, 0f));
+            Stretch(detailBackdrop.rectTransform);
+            detailBackdrop.raycastTarget = true;
+            Button detailBackdropButton = AddInvisibleButton(detailBackdrop);
+
+            Image detailObject = CreateImage("DetailObject", detailRoot.transform, null, Color.white);
+            SetRect(detailObject.rectTransform, new Vector2(0.5f, 0.58f), new Vector2(640f, 520f));
+            detailObject.preserveAspect = true;
+            detailObject.raycastTarget = false;
+
+            Text detailText = CreateText("DetailText", detailRoot.transform, string.Empty, font, 42, TextAnchor.MiddleCenter);
+            detailText.color = new Color(1f, 0.97f, 0.88f, 0f);
+            detailText.lineSpacing = 1.12f;
+            SetRect(detailText.rectTransform, new Vector2(0.5f, 0.19f), new Vector2(980f, 190f));
+            detailRoot.SetActive(false);
+
             GameObject controllerObject = new GameObject("ChapterOneController");
             ChapterOneController controller = controllerObject.AddComponent<ChapterOneController>();
             ConfigureChapterOneController(
@@ -530,10 +560,19 @@ namespace Arendalle.EditorTools
                 incomingPage,
                 pageTurnHighlight,
                 pageEdgeButton,
+                previousPageEdgeButton,
                 itemGroup,
                 todoListButton,
                 blueBarcodeCardButton,
-                yellowNoteClipButton);
+                yellowNoteClipButton,
+                todoListSprite,
+                blueBarcodeCardSprite,
+                yellowNoteClipSprite,
+                detailGroup,
+                detailBackdropButton,
+                detailBackdrop,
+                detailObject,
+                detailText);
 
             EditorSceneManager.SaveScene(scene, ChapterScenePath);
         }
@@ -695,7 +734,6 @@ namespace Arendalle.EditorTools
             serializedObject.FindProperty("whiteFade").objectReferenceValue = whiteFade;
             serializedObject.FindProperty("sceneFadeDuration").floatValue = 1.15f;
             serializedObject.FindProperty("aboutFadeDuration").floatValue = 0.9f;
-            serializedObject.FindProperty("aboutHoldDuration").floatValue = 4f;
             serializedObject.FindProperty("musicSource").objectReferenceValue = musicSource;
             serializedObject.ApplyModifiedPropertiesWithoutUndo();
         }
@@ -708,10 +746,19 @@ namespace Arendalle.EditorTools
             Image incomingPageImage,
             Image pageTurnHighlight,
             Button pageEdgeButton,
+            Button previousPageEdgeButton,
             CanvasGroup itemGroup,
             Button todoListButton,
             Button blueBarcodeCardButton,
-            Button yellowNoteClipButton)
+            Button yellowNoteClipButton,
+            Sprite todoListDetailSprite,
+            Sprite blueBarcodeCardDetailSprite,
+            Sprite yellowNoteClipDetailSprite,
+            CanvasGroup detailGroup,
+            Button detailBackdropButton,
+            Image detailBackdropImage,
+            Image detailObjectImage,
+            Text detailText)
         {
             SerializedObject serializedObject = new SerializedObject(controller);
             serializedObject.FindProperty("memoImage").objectReferenceValue = memoImage;
@@ -720,16 +767,28 @@ namespace Arendalle.EditorTools
             serializedObject.FindProperty("incomingPageImage").objectReferenceValue = incomingPageImage;
             serializedObject.FindProperty("pageTurnHighlight").objectReferenceValue = pageTurnHighlight;
             serializedObject.FindProperty("pageEdgeButton").objectReferenceValue = pageEdgeButton;
+            serializedObject.FindProperty("previousPageEdgeButton").objectReferenceValue = previousPageEdgeButton;
             serializedObject.FindProperty("itemGroup").objectReferenceValue = itemGroup;
             serializedObject.FindProperty("todoListButton").objectReferenceValue = todoListButton;
             serializedObject.FindProperty("todoListTransform").objectReferenceValue = todoListButton.GetComponent<RectTransform>();
+            serializedObject.FindProperty("todoListDetailSprite").objectReferenceValue = todoListDetailSprite;
+            serializedObject.FindProperty("todoListDetailText").stringValue = "待办清单\n还没完成的事项被匆忙写下，像是在提醒某个必须按时完成的约定。";
             serializedObject.FindProperty("blueBarcodeCardButton").objectReferenceValue = blueBarcodeCardButton;
             serializedObject.FindProperty("blueBarcodeCardTransform").objectReferenceValue = blueBarcodeCardButton.GetComponent<RectTransform>();
+            serializedObject.FindProperty("blueBarcodeCardDetailSprite").objectReferenceValue = blueBarcodeCardDetailSprite;
+            serializedObject.FindProperty("blueBarcodeCardDetailText").stringValue = "蓝色条码卡\n折角的卡片保留着一串条码，也许能对应某处锁住的入口。";
             serializedObject.FindProperty("yellowNoteClipButton").objectReferenceValue = yellowNoteClipButton;
             serializedObject.FindProperty("yellowNoteClipTransform").objectReferenceValue = yellowNoteClipButton.GetComponent<RectTransform>();
-            serializedObject.FindProperty("itemShakeDuration").floatValue = 0.18f;
-            serializedObject.FindProperty("itemShakePixels").floatValue = 8f;
-            serializedObject.FindProperty("itemShakeDegrees").floatValue = 1.8f;
+            serializedObject.FindProperty("yellowNoteClipDetailSprite").objectReferenceValue = yellowNoteClipDetailSprite;
+            serializedObject.FindProperty("yellowNoteClipDetailText").stringValue = "黄色便签\n纸上写着按时吃药，边角的磨损说明它已经被反复看过很多次。";
+            serializedObject.FindProperty("detailGroup").objectReferenceValue = detailGroup;
+            serializedObject.FindProperty("detailBackdropButton").objectReferenceValue = detailBackdropButton;
+            serializedObject.FindProperty("detailBackdropImage").objectReferenceValue = detailBackdropImage;
+            serializedObject.FindProperty("detailObjectImage").objectReferenceValue = detailObjectImage;
+            serializedObject.FindProperty("detailText").objectReferenceValue = detailText;
+            serializedObject.FindProperty("detailFadeDuration").floatValue = 0.24f;
+            serializedObject.FindProperty("detailScaleDuration").floatValue = 0.28f;
+            serializedObject.FindProperty("detailBackdropAlpha").floatValue = 0.68f;
             serializedObject.FindProperty("pageTurnDuration").floatValue = 0.68f;
             serializedObject.ApplyModifiedPropertiesWithoutUndo();
         }

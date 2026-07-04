@@ -23,7 +23,6 @@ namespace Arendalle
         [SerializeField] private Image whiteFade;
         [SerializeField] private float sceneFadeDuration = 1.15f;
         [SerializeField] private float aboutFadeDuration = 0.9f;
-        [SerializeField] private float aboutHoldDuration = 4f;
 
         [Header("Music Placeholder")]
         [SerializeField] private AudioSource musicSource;
@@ -41,6 +40,7 @@ namespace Arendalle
         };
 
         private Coroutine runningRoutine;
+        private bool isAboutVisible;
 
         private void Awake()
         {
@@ -93,6 +93,14 @@ namespace Arendalle
             }
         }
 
+        private void Update()
+        {
+            if (isAboutVisible && runningRoutine == null && Input.GetKeyDown(KeyCode.Escape))
+            {
+                HideAbout();
+            }
+        }
+
         private void ApplyRuntimeFont()
         {
             if (preferredFontNames == null || preferredFontNames.Length == 0)
@@ -130,6 +138,16 @@ namespace Arendalle
         public void ShowAbout()
         {
             StartExclusiveRoutine(ShowAboutRoutine());
+        }
+
+        public void HideAbout()
+        {
+            if (!isAboutVisible)
+            {
+                return;
+            }
+
+            StartExclusiveRoutine(HideAboutRoutine());
         }
 
         private void PrepareMusic()
@@ -181,6 +199,7 @@ namespace Arendalle
 
         private IEnumerator ShowAboutRoutine()
         {
+            isAboutVisible = false;
             SetMenuInteractable(false);
 
             yield return FadeGroup(homeGroup, 1f, 0f, aboutFadeDuration);
@@ -188,15 +207,21 @@ namespace Arendalle
 
             SetGroup(aboutGroup, 0f, false);
             yield return FadeGroup(aboutGroup, 0f, 1f, aboutFadeDuration);
-            SetGroup(aboutGroup, 1f, false);
+            SetGroup(aboutGroup, 1f, true);
 
-            yield return new WaitForSecondsRealtime(aboutHoldDuration);
+            isAboutVisible = true;
+            runningRoutine = null;
+        }
 
+        private IEnumerator HideAboutRoutine()
+        {
+            isAboutVisible = false;
             yield return FadeGroup(aboutGroup, 1f, 0f, aboutFadeDuration);
             SetGroup(aboutGroup, 0f, false);
 
             yield return FadeGroup(homeGroup, 0f, 1f, aboutFadeDuration);
             SetGroup(homeGroup, 1f, true);
+            SetMenuInteractable(true);
 
             runningRoutine = null;
         }
