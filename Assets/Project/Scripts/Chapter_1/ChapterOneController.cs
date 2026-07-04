@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
@@ -38,6 +39,7 @@ namespace Arendalle
         [SerializeField] private Button detailBackdropButton;
         [SerializeField] private Image detailBackdropImage;
         [SerializeField] private Image detailObjectImage;
+        [SerializeField] private Button detailObjectButton;
         [SerializeField] private Text detailText;
 
         [Header("Animation")]
@@ -48,11 +50,20 @@ namespace Arendalle
 
         private Coroutine detailRoutine;
         private Coroutine pageTurnRoutine;
+        private ChapterOnePageItem activePageItem;
+        private Vector2 defaultDetailObjectSize;
+        private Vector3 defaultDetailObjectEulerAngles;
         private bool detailOpen;
         private bool pageTurned;
 
+        public bool IsPageTurned => pageTurned;
+        public event Action<bool> PageTurnStateChanged;
+
         private void Awake()
         {
+            CacheDetailObjectDefaults();
+            ConfigureDetailObjectButton();
+
             if (memoImage != null && memoHomeSprite != null)
             {
                 memoImage.sprite = memoHomeSprite;
@@ -106,6 +117,11 @@ namespace Arendalle
                 detailBackdropButton.onClick.RemoveListener(CloseDetail);
             }
 
+            if (detailObjectButton != null)
+            {
+                detailObjectButton.onClick.RemoveListener(ToggleActivePageItemSide);
+            }
+
             if (pageEdgeButton != null)
             {
                 pageEdgeButton.onClick.RemoveListener(TurnPage);
@@ -142,6 +158,12 @@ namespace Arendalle
             if (detailBackdropButton != null)
             {
                 detailBackdropButton.onClick.AddListener(CloseDetail);
+            }
+
+            if (detailObjectButton != null)
+            {
+                detailObjectButton.onClick.RemoveListener(ToggleActivePageItemSide);
+                detailObjectButton.onClick.AddListener(ToggleActivePageItemSide);
             }
 
             if (pageEdgeButton != null)
@@ -188,17 +210,22 @@ namespace Arendalle
                 return;
             }
 
-            if (detailObjectImage != null)
+            activePageItem = null;
+            ApplyDetailContent(sprite, text, defaultDetailObjectSize, defaultDetailObjectEulerAngles, false);
+
+            StartDetailRoutine(ShowDetailRoutine());
+        }
+
+        public void OpenPageItemDetail(ChapterOnePageItem item)
+        {
+            if (!pageTurned || detailOpen || pageTurnRoutine != null || IsWatchDetailOpen() || item == null)
             {
-                detailObjectImage.sprite = sprite;
-                detailObjectImage.preserveAspect = true;
+                return;
             }
 
-            if (detailText != null)
-            {
-                detailText.text = text;
-            }
-
+            activePageItem = item;
+            activePageItem.ResetDetailSide();
+            ApplyActivePageItemDetail();
             StartDetailRoutine(ShowDetailRoutine());
         }
 
@@ -315,6 +342,8 @@ namespace Arendalle
 
             detailOpen = false;
             SetDetailVisible(false, 0f);
+            activePageItem = null;
+            ApplyDetailContent(null, string.Empty, defaultDetailObjectSize, defaultDetailObjectEulerAngles, false);
             detailRoutine = null;
         }
 
@@ -399,6 +428,7 @@ namespace Arendalle
             }
 
             pageTurned = true;
+            PageTurnStateChanged?.Invoke(pageTurned);
             SetPageEdgeButtons(false, true);
             SetWatchSceneInteractable(true);
             pageTurnRoutine = null;
@@ -488,6 +518,7 @@ namespace Arendalle
             }
 
             pageTurned = false;
+            PageTurnStateChanged?.Invoke(pageTurned);
             SetPageEdgeButtons(CanTurnForwardPage(), false);
             SetWatchSceneInteractable(true);
             pageTurnRoutine = null;
@@ -571,6 +602,87 @@ namespace Arendalle
             if (detailText != null)
             {
                 SetTextAlpha(detailText, alpha);
+            }
+        }
+
+        private void CacheDetailObjectDefaults()
+        {
+            if (detailObjectImage == null)
+            {
+                return;
+            }
+
+            RectTransform rectTransform = detailObjectImage.rectTransform;
+            defaultDetailObjectSize = rectTransform.sizeDelta;
+            defaultDetailObjectEulerAngles = rectTransform.localEulerAngles;
+        }
+
+        private void ConfigureDetailObjectButton()
+        {
+            if (detailObjectImage == null)
+            {
+                return;
+            }
+
+            if (detailObjectButton == null)
+            {
+                detailObjectButton = detailObjectImage.GetComponent<Button>();
+            }
+
+            if (detailObjectButton == null)
+            {
+                detailObjectButton = detailObjectImage.gameObject.AddComponent<Button>();
+            }
+
+            detailObjectButton.transition = Selectable.Transition.None;
+            detailObjectButton.targetGraphic = detailObjectImage;
+        }
+
+        private void ToggleActivePageItemSide()
+        {
+            if (!detailOpen || activePageItem == null || !activePageItem.CanFlipInDetail)
+            {
+                return;
+            }
+
+            activePageItem.ToggleDetailSide();
+            ApplyActivePageItemDetail();
+        }
+
+        private void ApplyActivePageItemDetail()
+        {
+            if (activePageItem == null)
+            {
+                return;
+            }
+
+            ApplyDetailContent(
+                activePageItem.CurrentDetailSprite,
+                activePageItem.CurrentDetailText,
+                activePageItem.DetailSize,
+                activePageItem.DetailEulerAngles,
+                activePageItem.CanFlipInDetail);
+        }
+
+        private void ApplyDetailContent(Sprite sprite, string text, Vector2 objectSize, Vector3 objectEulerAngles, bool canFlip)
+        {
+            if (detailObjectImage != null)
+            {
+                detailObjectImage.sprite = sprite;
+                detailObjectImage.preserveAspect = true;
+                detailObjectImage.raycastTarget = canFlip;
+                detailObjectImage.rectTransform.sizeDelta = objectSize;
+                detailObjectImage.rectTransform.localEulerAngles = objectEulerAngles;
+            }
+
+            if (detailObjectButton != null)
+            {
+                detailObjectButton.interactable = canFlip;
+            }
+
+            if (detailText != null)
+            {
+                detailText.text = text;
             }
         }
 

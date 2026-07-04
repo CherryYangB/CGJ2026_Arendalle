@@ -17,6 +17,7 @@ namespace Arendalle.EditorTools
 
         private const string HomeScenePath = "Assets/Project/Scenes/Home.unity";
         private const string ChapterScenePath = "Assets/Project/Scenes/Chapter_1.unity";
+        private const string ChapterTwoScenePath = "Assets/Project/Scenes/Chapter_2.unity";
         private const string BorderSpritePath = "Assets/Project/Art/UI/HomeMenuBorder.png";
         private const string ButtonSpritePath = "Assets/Project/Art/UI/HandDrawnButton.png";
         private const string ChapterBackgroundSpritePath = "Assets/Project/Art/Background/bg_bg_s1_v1.png";
@@ -30,6 +31,12 @@ namespace Arendalle.EditorTools
         private const string YellowNoteClipSpritePath = ChapterSpriteFolder + "/yellow_note_clip.png";
         private const string YellowNoteClipDetailSpritePath = ChapterSpriteFolder + "/detail_yellow_note_clip.png";
         private const string WatchSpritePath = ChapterSpriteFolder + "/watch.png";
+        private const string WeddingInvitationSpritePath = ChapterSpriteFolder + "/wedding_invi_card.png";
+        private const string WeddingInvitationBackSpritePath = ChapterSpriteFolder + "/wedding_invi_card_back.png";
+        private const string MovieTicketOneSpritePath = ChapterSpriteFolder + "/mov_ticket_1.png";
+        private const string MovieTicketTwoSpritePath = ChapterSpriteFolder + "/mov_ticket_2.png";
+        private const string MovieTicketBackSpritePath = ChapterSpriteFolder + "/mov_ticket_back.png";
+        private const string MarriedPhotoSpritePath = ChapterSpriteFolder + "/married_photo.jpg";
         private const string AutoRunRequestPath = "Temp/RebuildHomeMenu.request";
 
         static MainMenuSceneBuilder()
@@ -115,6 +122,12 @@ namespace Arendalle.EditorTools
             EnsureSpriteImport(YellowNoteClipSpritePath);
             EnsureSpriteImport(YellowNoteClipDetailSpritePath);
             EnsureSpriteImport(WatchSpritePath);
+            EnsureSpriteImport(WeddingInvitationSpritePath);
+            EnsureSpriteImport(WeddingInvitationBackSpritePath);
+            EnsureSpriteImport(MovieTicketOneSpritePath);
+            EnsureSpriteImport(MovieTicketTwoSpritePath);
+            EnsureSpriteImport(MovieTicketBackSpritePath);
+            EnsureSpriteImport(MarriedPhotoSpritePath);
         }
 
         private static void EnsureSpriteImport(string assetPath)
@@ -475,6 +488,12 @@ namespace Arendalle.EditorTools
             Sprite yellowNoteClipSprite = AssetDatabase.LoadAssetAtPath<Sprite>(YellowNoteClipSpritePath);
             Sprite yellowNoteClipDetailSprite = AssetDatabase.LoadAssetAtPath<Sprite>(YellowNoteClipDetailSpritePath);
             Sprite watchSprite = AssetDatabase.LoadAssetAtPath<Sprite>(WatchSpritePath);
+            Sprite weddingInvitationSprite = AssetDatabase.LoadAssetAtPath<Sprite>(WeddingInvitationSpritePath);
+            Sprite weddingInvitationBackSprite = AssetDatabase.LoadAssetAtPath<Sprite>(WeddingInvitationBackSpritePath);
+            Sprite movieTicketOneSprite = AssetDatabase.LoadAssetAtPath<Sprite>(MovieTicketOneSpritePath);
+            Sprite movieTicketTwoSprite = AssetDatabase.LoadAssetAtPath<Sprite>(MovieTicketTwoSpritePath);
+            Sprite movieTicketBackSprite = AssetDatabase.LoadAssetAtPath<Sprite>(MovieTicketBackSpritePath);
+            Sprite marriedPhotoSprite = AssetDatabase.LoadAssetAtPath<Sprite>(MarriedPhotoSpritePath);
             Font font = GetDefaultFont();
 
             GameObject canvasObject = new GameObject("ChapterCanvas", typeof(RectTransform), typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
@@ -530,6 +549,41 @@ namespace Arendalle.EditorTools
                 yellowNoteClipSprite,
                 new Vector2(-490f, -185f),
                 new Vector2(392f, 377f));
+
+            GameObject pageOneItemRoot = CreateUiObject("PageOneItems", memoRoot.transform);
+            Stretch(pageOneItemRoot.GetComponent<RectTransform>());
+
+            ChapterOnePageItem weddingInvitation = CreatePageOneItem(
+                "WeddingInvitationCard",
+                pageOneItemRoot.transform,
+                weddingInvitationSprite,
+                new Vector2(-410f, 70f),
+                new Vector2(380f, 510f),
+                -8f);
+
+            ChapterOnePageItem movieTicketOne = CreatePageOneItem(
+                "MovieTicket1",
+                pageOneItemRoot.transform,
+                movieTicketOneSprite,
+                new Vector2(355f, -165f),
+                new Vector2(245f, 245f),
+                7f);
+
+            ChapterOnePageItem movieTicketTwo = CreatePageOneItem(
+                "MovieTicket2",
+                pageOneItemRoot.transform,
+                movieTicketTwoSprite,
+                new Vector2(470f, -150f),
+                new Vector2(245f, 245f),
+                -4f);
+
+            ChapterOnePageItem marriedPhoto = CreatePageOneItem(
+                "MarriedPhoto",
+                pageOneItemRoot.transform,
+                marriedPhotoSprite,
+                new Vector2(410f, 145f),
+                new Vector2(300f, 410f),
+                90f);
 
             Image pageTurnHighlight = CreateImage("PageTurnHighlight", memoRoot.transform, null, new Color(1f, 1f, 1f, 0f));
             SetRect(pageTurnHighlight.rectTransform, new Vector2(0.5f, 0.5f), new Vector2(64f, 820f), new Vector2(575f, 0f));
@@ -597,6 +651,58 @@ namespace Arendalle.EditorTools
                 detailBackdrop,
                 detailObject,
                 detailText);
+
+            ConfigurePageOneItem(
+                weddingInvitation,
+                controller,
+                weddingInvitationSprite,
+                weddingInvitationBackSprite,
+                "婚礼邀请函\n封面上写着十一月二十二日。也许这不是单纯的纪念日。",
+                "婚礼邀请函背面\n背面留下的日期指向下一段记忆：把电子表调到 26.11.22。",
+                true,
+                new Vector2(520f, 700f),
+                Vector3.zero,
+                "26.11.22");
+
+            ConfigurePageOneItem(
+                movieTicketOne,
+                controller,
+                movieTicketOneSprite,
+                movieTicketBackSprite,
+                "电影票副券\n票面上的场次和时间像是被刻意留下的线索。",
+                "电影票背面\n票根背面指向电影开场日：把电子表调到 26.03.05。",
+                true,
+                new Vector2(560f, 560f),
+                Vector3.zero,
+                "26.03.05");
+
+            ConfigurePageOneItem(
+                movieTicketTwo,
+                controller,
+                movieTicketTwoSprite,
+                movieTicketBackSprite,
+                "电影票副券\n另一张票根和第一张拼在一起，留下同一个日期。",
+                "电影票背面\n背面的票根指向电影开场日：把电子表调到 26.03.05。",
+                true,
+                new Vector2(560f, 560f),
+                Vector3.zero,
+                "26.03.05");
+
+            ConfigurePageOneItem(
+                marriedPhoto,
+                controller,
+                marriedPhotoSprite,
+                null,
+                "婚照\n照片被横放在页面空处，像是被匆忙塞进本子。把电子表调到 26.05.20 后，会播放后续影像。",
+                string.Empty,
+                false,
+                new Vector2(520f, 700f),
+                Vector3.zero,
+                "26.05.20");
+
+            GameObject pageFlowObject = new GameObject("ChapterOnePageFlow");
+            ChapterOnePageFlow pageFlow = pageFlowObject.AddComponent<ChapterOnePageFlow>();
+            ConfigureChapterOnePageFlow(pageFlow, controller, watchTimeDisplay, weddingInvitation, movieTicketOne, movieTicketTwo, marriedPhoto);
 
             EditorSceneManager.SaveScene(scene, ChapterScenePath);
         }
@@ -682,6 +788,22 @@ namespace Arendalle.EditorTools
             image.raycastTarget = true;
 
             return AddInvisibleButton(image);
+        }
+
+        private static ChapterOnePageItem CreatePageOneItem(
+            string name,
+            Transform parent,
+            Sprite sprite,
+            Vector2 anchoredPosition,
+            Vector2 size,
+            float rotationZ)
+        {
+            Button button = CreateClickableImage(name, parent, sprite, anchoredPosition, size);
+            button.transform.localEulerAngles = new Vector3(0f, 0f, rotationZ);
+            button.gameObject.AddComponent<global::ShakeOnHover>();
+            ChapterOnePageItem item = button.gameObject.AddComponent<ChapterOnePageItem>();
+            button.gameObject.SetActive(false);
+            return item;
         }
 
         private static WatchTimeDisplay CreateWatchLayer(Transform parent, Sprite watchSprite, Font font, Transform beforeSibling)
@@ -925,11 +1047,65 @@ namespace Arendalle.EditorTools
             serializedObject.FindProperty("detailBackdropButton").objectReferenceValue = detailBackdropButton;
             serializedObject.FindProperty("detailBackdropImage").objectReferenceValue = detailBackdropImage;
             serializedObject.FindProperty("detailObjectImage").objectReferenceValue = detailObjectImage;
+            serializedObject.FindProperty("detailObjectButton").objectReferenceValue = null;
             serializedObject.FindProperty("detailText").objectReferenceValue = detailText;
             serializedObject.FindProperty("detailFadeDuration").floatValue = 0.24f;
             serializedObject.FindProperty("detailScaleDuration").floatValue = 0.28f;
             serializedObject.FindProperty("detailBackdropAlpha").floatValue = 0.68f;
             serializedObject.FindProperty("pageTurnDuration").floatValue = 0.68f;
+            serializedObject.ApplyModifiedPropertiesWithoutUndo();
+        }
+
+        private static void ConfigurePageOneItem(
+            ChapterOnePageItem item,
+            ChapterOneController controller,
+            Sprite frontSprite,
+            Sprite backSprite,
+            string frontText,
+            string backText,
+            bool canFlipInDetail,
+            Vector2 detailSize,
+            Vector3 detailEulerAngles,
+            string triggerDate)
+        {
+            SerializedObject serializedObject = new SerializedObject(item);
+            serializedObject.FindProperty("detailController").objectReferenceValue = controller;
+            serializedObject.FindProperty("sceneImage").objectReferenceValue = item.GetComponent<Image>();
+            serializedObject.FindProperty("sceneButton").objectReferenceValue = item.GetComponent<Button>();
+            serializedObject.FindProperty("frontSprite").objectReferenceValue = frontSprite;
+            serializedObject.FindProperty("backSprite").objectReferenceValue = backSprite;
+            serializedObject.FindProperty("frontText").stringValue = frontText;
+            serializedObject.FindProperty("backText").stringValue = backText;
+            serializedObject.FindProperty("canFlipInDetail").boolValue = canFlipInDetail;
+            serializedObject.FindProperty("detailSize").vector2Value = detailSize;
+            serializedObject.FindProperty("detailEulerAngles").vector3Value = detailEulerAngles;
+            serializedObject.FindProperty("triggerDate").stringValue = triggerDate;
+            serializedObject.ApplyModifiedPropertiesWithoutUndo();
+        }
+
+        private static void ConfigureChapterOnePageFlow(
+            ChapterOnePageFlow pageFlow,
+            ChapterOneController controller,
+            WatchTimeDisplay watchTimeDisplay,
+            ChapterOnePageItem weddingInvitation,
+            ChapterOnePageItem movieTicketOne,
+            ChapterOnePageItem movieTicketTwo,
+            ChapterOnePageItem marriedPhoto)
+        {
+            SerializedObject serializedObject = new SerializedObject(pageFlow);
+            serializedObject.FindProperty("chapterController").objectReferenceValue = controller;
+            serializedObject.FindProperty("watchTimeDisplay").objectReferenceValue = watchTimeDisplay;
+            serializedObject.FindProperty("weddingInvitation").objectReferenceValue = weddingInvitation;
+
+            SerializedProperty movieTickets = serializedObject.FindProperty("movieTickets");
+            movieTickets.arraySize = 2;
+            movieTickets.GetArrayElementAtIndex(0).objectReferenceValue = movieTicketOne;
+            movieTickets.GetArrayElementAtIndex(1).objectReferenceValue = movieTicketTwo;
+
+            serializedObject.FindProperty("marriedPhoto").objectReferenceValue = marriedPhoto;
+            serializedObject.FindProperty("endingVideoClip").objectReferenceValue = null;
+            serializedObject.FindProperty("nextSceneName").stringValue = "Chapter_2";
+            serializedObject.FindProperty("missingVideoFallbackDelay").floatValue = 0.25f;
             serializedObject.ApplyModifiedPropertiesWithoutUndo();
         }
 
@@ -939,6 +1115,7 @@ namespace Arendalle.EditorTools
             {
                 HomeScenePath,
                 ChapterScenePath,
+                ChapterTwoScenePath,
                 "Assets/Scenes/SampleScene.unity"
             };
 

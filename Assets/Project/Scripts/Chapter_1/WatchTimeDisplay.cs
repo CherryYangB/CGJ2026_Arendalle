@@ -40,7 +40,9 @@ namespace Arendalle
 
         public bool IsDetailOpen => detailOpen;
         public bool HasBeenOpened { get; private set; }
+        public DateTime DisplayedDate => displayedDate;
         public event Action FirstOpened;
+        public event Action<DateTime> DateChanged;
 
         private void Awake()
         {
@@ -304,12 +306,18 @@ namespace Arendalle
                 return;
             }
 
-            if (TryParseShortDate(input, out DateTime parsedDate))
+            bool parsed = TryParseShortDate(input, out DateTime parsedDate);
+            if (parsed)
             {
                 displayedDate = parsedDate;
             }
 
             UpdateDateTexts();
+
+            if (parsed)
+            {
+                DateChanged?.Invoke(displayedDate);
+            }
         }
 
         private void SetDetailVisible(bool visible, float alpha)
