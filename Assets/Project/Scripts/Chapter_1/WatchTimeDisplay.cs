@@ -31,25 +31,28 @@ namespace Arendalle
         [SerializeField] private float detailScaleDuration = 0.28f;
         [SerializeField] private float detailBackdropAlpha = 0.68f;
 
-        private DateTime displayedDate;
+        private TimeSpan displayedTime;
         private Coroutine detailRoutine;
         private bool detailOpen;
         private bool docked;
         private bool requestedSceneInteractable = true;
-        private bool suppressDateInputCommit;
+        private bool suppressTimeInputCommit;
 
         public bool IsDetailOpen => detailOpen;
         public bool HasBeenOpened { get; private set; }
+        public TimeSpan DisplayedTime => displayedTime;
         public event Action FirstOpened;
+        public event Action<TimeSpan> TimeChanged;
 
         private void Awake()
         {
-            displayedDate = DateTime.Now.Date;
+            DateTime now = DateTime.Now;
+            displayedTime = new TimeSpan(now.Hour, now.Minute, 0);
             SetDetailVisible(false, 0f);
-            ConfigureDateInputField();
+            ConfigureTimeInputField();
             RegisterListeners();
             ApplySceneInteractable();
-            UpdateDateTexts();
+            UpdateTimeTexts();
             SyncDetailDateLayoutFromScene();
         }
 
@@ -67,7 +70,7 @@ namespace Arendalle
 
             if (detailDateInputField != null)
             {
-                detailDateInputField.onEndEdit.RemoveListener(CommitDateInput);
+                detailDateInputField.onEndEdit.RemoveListener(CommitTimeInput);
             }
         }
 
@@ -123,8 +126,8 @@ namespace Arendalle
 
             if (detailDateInputField != null)
             {
-                detailDateInputField.onEndEdit.RemoveListener(CommitDateInput);
-                detailDateInputField.onEndEdit.AddListener(CommitDateInput);
+                detailDateInputField.onEndEdit.RemoveListener(CommitTimeInput);
+                detailDateInputField.onEndEdit.AddListener(CommitTimeInput);
             }
         }
 
@@ -215,7 +218,7 @@ namespace Arendalle
             sceneWatchTransform.localEulerAngles = new Vector3(0f, 0f, dockedRotation);
         }
 
-        private void ConfigureDateInputField()
+        private void ConfigureTimeInputField()
         {
             if (detailDateText == null)
             {
@@ -238,7 +241,7 @@ namespace Arendalle
             detailDateInputField.transition = Selectable.Transition.None;
             detailDateInputField.contentType = InputField.ContentType.Standard;
             detailDateInputField.lineType = InputField.LineType.SingleLine;
-            detailDateInputField.characterLimit = 8;
+            detailDateInputField.characterLimit = 5;
         }
 
         private void SyncDetailDateLayoutFromScene()
@@ -275,9 +278,9 @@ namespace Arendalle
             detailDateText.resizeTextMaxSize = sceneDateText.resizeTextMaxSize;
         }
 
-        private void UpdateDateTexts()
+        private void UpdateTimeTexts()
         {
-            string value = displayedDate.ToString("yy.MM.dd");
+            string value = FormatClockTime(displayedTime);
 
             if (sceneDateText != null)
             {
@@ -291,25 +294,31 @@ namespace Arendalle
 
             if (detailDateInputField != null)
             {
-                suppressDateInputCommit = true;
+                suppressTimeInputCommit = true;
                 detailDateInputField.text = value;
-                suppressDateInputCommit = false;
+                suppressTimeInputCommit = false;
             }
         }
 
-        private void CommitDateInput(string input)
+        private void CommitTimeInput(string input)
         {
-            if (suppressDateInputCommit)
+            if (suppressTimeInputCommit)
             {
                 return;
             }
 
-            if (TryParseShortDate(input, out DateTime parsedDate))
+            bool parsed = TryParseClockTime(input, out TimeSpan parsedTime);
+            if (parsed)
             {
-                displayedDate = parsedDate;
+                displayedTime = parsedTime;
             }
 
-            UpdateDateTexts();
+            UpdateTimeTexts();
+
+            if (parsed)
+            {
+                TimeChanged?.Invoke(displayedTime);
+            }
         }
 
         private void SetDetailVisible(bool visible, float alpha)
@@ -372,37 +381,35 @@ namespace Arendalle
             return value * value * (3f - 2f * value);
         }
 
-        private static bool TryParseShortDate(string value, out DateTime parsedDate)
+        private static string FormatClockTime(TimeSpan time)
         {
-            parsedDate = default;
+            return $"{time.Hours:00}:{time.Minutes:00}";
+        }
+
+        private static bool TryParseClockTime(string value, out TimeSpan parsedTime)
+        {
+            parsedTime = default;
             if (string.IsNullOrWhiteSpace(value))
             {
                 return false;
             }
 
-            string[] parts = value.Trim().Split('.');
-            if (parts.Length != 3
-                || !int.TryParse(parts[0], out int year)
-                || !int.TryParse(parts[1], out int month)
-                || !int.TryParse(parts[2], out int day))
+            string[] parts = value.Trim().Split(':', '.');
+            if (parts.Length != 2
+                || parts[0].Length != 2
+                || parts[1].Length != 2
+                || !int.TryParse(parts[0], out int hour)
+                || !int.TryParse(parts[1], out int minute)
+                || hour < 0
+                || hour > 23
+                || minute < 0
+                || minute > 59)
             {
                 return false;
             }
 
-            if (parts[0].Length == 2)
-            {
-                year += 2000;
-            }
-
-            try
-            {
-                parsedDate = new DateTime(year, month, day);
-                return true;
-            }
-            catch (ArgumentOutOfRangeException)
-            {
-                return false;
-            }
+            parsedTime = new TimeSpan(hour, minute, 0);
+            return true;
         }
     }
 }
