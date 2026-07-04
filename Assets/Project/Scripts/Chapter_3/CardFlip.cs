@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class CardFlip : MonoBehaviour
 {
-    public GameObject frontSide;   
-    public GameObject backSide;    
+    public GameObject frontSide;
+    public GameObject backSide;
     private bool isFront = true;   // 当前是否正面
 
     void Start()
