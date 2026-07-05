@@ -1059,8 +1059,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 575, y: 0}
-  m_SizeDelta: {x: 64, y: 820}
+  m_AnchoredPosition: {x: 575, y: 8.062}
+  m_SizeDelta: {x: 64, y: 665.2108}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &911831026
 CanvasRenderer:
@@ -1646,7 +1646,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 4a3ffaad117c7b143b54940b122e8680, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 59f958adb36404ca783fdb67c7066af6, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -2116,7 +2116,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: d572d34c521824ff299c43e6bc2ed44f, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 36cf3e077a6674ee2bc7b84c62b8ce45, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -2156,8 +2156,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   memoImage: {fileID: 1761480170}
-  memoHomeSprite: {fileID: 21300000, guid: d572d34c521824ff299c43e6bc2ed44f, type: 3}
-  memoPageOneSprite: {fileID: 21300000, guid: 70fed6c3de5dd4d039b66ec265f927a2, type: 3}
+  memoHomeSprite: {fileID: 21300000, guid: 36cf3e077a6674ee2bc7b84c62b8ce45, type: 3}
+  memoPageOneSprite: {fileID: 21300000, guid: 0f7f2c445a64a46d2a2c2245e048a66d, type: 3}
   incomingPageImage: {fileID: 36615776}
   pageTurnHighlight: {fileID: 911831027}
   pageEdgeButton: {fileID: 1639018882}

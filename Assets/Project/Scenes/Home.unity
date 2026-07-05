@@ -633,13 +633,9 @@ MonoBehaviour:
   transitionTextHoldDuration: 3
   transitionTextFadeOutDuration: 0.75
   aboutFadeDuration: 0.9
-  preferredFontNames:
-  - default
-  - default
-  - default
-  - default
-  - default
-  - default
+  defaultFont: {fileID: 12800000, guid: 526a8a54cf7aa409c88829b56635b1b6, type: 3}
+  transitionMessageFontSize: 40
+  preferredFontNames: []
 --- !u!4 &610402561
 Transform:
   m_ObjectHideFlags: 0
@@ -928,7 +924,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 7cb177c1bef6a4319b0b5ea8266b1fe1, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 0b05cac64ad97440dbcf55fdc28b3243, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1

@@ -34,6 +34,8 @@ namespace Arendalle
 
 
         [Header("Text")]
+        [SerializeField] private Font defaultFont;
+        [SerializeField, Min(1)] private int transitionMessageFontSize = 48;
         [SerializeField] private string[] preferredFontNames =
         {
             "default",
@@ -46,11 +48,13 @@ namespace Arendalle
 
         private Coroutine runningRoutine;
         private bool isAboutVisible;
+        private Font runtimeFont;
 
         private void Awake()
         {
             ResolveTransitionTextReferences();
             ApplyRuntimeFont();
+            ApplyTransitionTextStyle();
 
             if (startButton != null)
             {
@@ -110,12 +114,7 @@ namespace Arendalle
 
         private void ApplyRuntimeFont()
         {
-            if (preferredFontNames == null || preferredFontNames.Length == 0)
-            {
-                return;
-            }
-
-            Font font = Font.CreateDynamicFontFromOSFont(preferredFontNames, 32);
+            Font font = ResolveRuntimeFont();
             if (font == null)
             {
                 return;
@@ -126,6 +125,27 @@ namespace Arendalle
             {
                 texts[i].font = font;
             }
+        }
+
+        private Font ResolveRuntimeFont()
+        {
+            if (defaultFont != null)
+            {
+                return defaultFont;
+            }
+
+            if (runtimeFont != null)
+            {
+                return runtimeFont;
+            }
+
+            if (preferredFontNames == null || preferredFontNames.Length == 0)
+            {
+                return null;
+            }
+
+            runtimeFont = Font.CreateDynamicFontFromOSFont(preferredFontNames, 32);
+            return runtimeFont;
         }
 
         public void StartGame()
@@ -353,8 +373,25 @@ namespace Arendalle
         {
             if (transitionText != null)
             {
+                ApplyTransitionTextStyle();
                 transitionText.text = message;
             }
+        }
+
+        private void ApplyTransitionTextStyle()
+        {
+            if (transitionText == null)
+            {
+                return;
+            }
+
+            Font font = ResolveRuntimeFont();
+            if (font != null)
+            {
+                transitionText.font = font;
+            }
+
+            transitionText.fontSize = Mathf.Max(1, transitionMessageFontSize);
         }
 
         private void ResolveTransitionTextReferences()

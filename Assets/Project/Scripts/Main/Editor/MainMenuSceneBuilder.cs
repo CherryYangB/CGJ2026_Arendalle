@@ -481,7 +481,7 @@ namespace Arendalle.EditorTools
 
             GameObject controllerObject = new GameObject("MainMenuController");
             MainMenuController controller = controllerObject.AddComponent<MainMenuController>();
-            ConfigureController(controller, startButton, quitButton, aboutButton, homeGroup, aboutGroup, whiteFade, transitionTextGroup, transitionText, musicSource);
+            ConfigureController(controller, startButton, quitButton, aboutButton, homeGroup, aboutGroup, whiteFade, transitionTextGroup, transitionText, font, musicSource);
 
             EditorSceneManager.SaveScene(scene, HomeScenePath);
         }
@@ -1065,6 +1065,7 @@ namespace Arendalle.EditorTools
             Image whiteFade,
             CanvasGroup transitionTextGroup,
             Text transitionText,
+            Font font,
             AudioSource musicSource)
         {
             SerializedObject serializedObject = new SerializedObject(controller);
@@ -1083,6 +1084,8 @@ namespace Arendalle.EditorTools
             serializedObject.FindProperty("transitionTextHoldDuration").floatValue = 0.8f;
             serializedObject.FindProperty("transitionTextFadeOutDuration").floatValue = 0.75f;
             serializedObject.FindProperty("aboutFadeDuration").floatValue = 0.9f;
+            serializedObject.FindProperty("defaultFont").objectReferenceValue = font;
+            serializedObject.FindProperty("transitionMessageFontSize").intValue = 48;
             serializedObject.ApplyModifiedPropertiesWithoutUndo();
         }
 
