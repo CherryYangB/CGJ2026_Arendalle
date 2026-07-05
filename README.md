@@ -3,11 +3,14 @@
 
 ---
 
+
+
 > “I feel as if I'm losing all my leaves... the branches, and the wind, and the rain. I have nowhere to put my head down anymore.”
 > 
 > “我感觉自己正在一片片凋零……那些树枝，还有风和雨。我再也没有栖身之地了。”
 > 
 > --《困在时间的父亲》（The Father，2020）
+
 
 
 ---
@@ -110,10 +113,8 @@ All rights reserved. This project is created for the CGJ 2026 game jam and is no
 ---
 
 > **即使终将遗忘，爱永远是回家的锚。**
-
 > **Even when memories fade, love is always the anchor that brings us home.**
-
+> 
 > 献给所有在记忆中迷失的人，和所有守护他们的人。
-
 > For those lost in memory, and for those who stay by their side.
 
