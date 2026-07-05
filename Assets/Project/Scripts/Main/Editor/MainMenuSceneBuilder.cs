@@ -1165,9 +1165,6 @@ namespace Arendalle.EditorTools
             serializedObject.FindProperty("pageTurnDuration").floatValue = 0.68f;
             serializedObject.FindProperty("pageTurnHintBlinkDuration").floatValue = 1.8f;
             serializedObject.FindProperty("pageTurnHintMaxAlpha").floatValue = 0.22f;
-            serializedObject.FindProperty("pauseOnDetailAudioSources").arraySize = 0;
-            serializedObject.FindProperty("detailAudioSource").objectReferenceValue = null;
-            serializedObject.FindProperty("detailAudioVolume").floatValue = 1f;
             serializedObject.ApplyModifiedPropertiesWithoutUndo();
         }
 
@@ -1236,6 +1233,7 @@ namespace Arendalle.EditorTools
             serializedObject.FindProperty("endingVideoClip").objectReferenceValue = null;
             serializedObject.FindProperty("nextSceneName").stringValue = "Assets/Project/Scenes/Chapter_3";
             serializedObject.FindProperty("missingVideoFallbackDelay").floatValue = 0.25f;
+            serializedObject.FindProperty("endingVideoPlaybackSpeed").floatValue = 1f;
             serializedObject.FindProperty("stopOnEndingVideoAudioSources").arraySize = 0;
             serializedObject.ApplyModifiedPropertiesWithoutUndo();
         }

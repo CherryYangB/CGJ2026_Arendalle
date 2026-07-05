@@ -590,7 +590,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   appearClipA: {fileID: 0}
   loopClipB: {fileID: 0}
-  disableAudioSources: []
 --- !u!82 &631002812
 AudioSource:
   m_ObjectHideFlags: 0
@@ -1425,8 +1424,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   appearClipA: {fileID: 8300000, guid: a5b4be5d8fcf9514bab3b989e310f903, type: 3}
   loopClipB: {fileID: 0}
-  disableAudioSources:
-  - {fileID: 1367171326}
 --- !u!82 &1024849355
 AudioSource:
   m_ObjectHideFlags: 0
@@ -1694,7 +1691,7 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 8300000, guid: c1361a587fa4242648eb66aca4641d97, type: 3}
+  m_audioClip: {fileID: 8300000, guid: ffe5fc6c871b0434f946d1c380195f09, type: 3}
   m_PlayOnAwake: 1
   m_Volume: 0.2
   m_Pitch: 1
@@ -2191,10 +2188,6 @@ MonoBehaviour:
   pageTurnDuration: 0.68
   pageTurnHintBlinkDuration: 1.8
   pageTurnHintMaxAlpha: 0.22
-  pauseOnDetailAudioSources:
-  - {fileID: 1367171326}
-  detailAudioSource: {fileID: 0}
-  detailAudioVolume: 1
 --- !u!4 &1872168215
 Transform:
   m_ObjectHideFlags: 0
@@ -2687,7 +2680,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   appearClipA: {fileID: 8300000, guid: a5b4be5d8fcf9514bab3b989e310f903, type: 3}
   loopClipB: {fileID: 0}
-  disableAudioSources: []
 --- !u!82 &1900100034
 AudioSource:
   m_ObjectHideFlags: 0
@@ -3343,7 +3335,6 @@ MonoBehaviour:
   detailSize: {x: 520, y: 700}
   detailEulerAngles: {x: 0, y: 0, z: 0}
   triggerDate: 17:30
-  audioClip: {fileID: 8300000, guid: 8cfe4ffe889484a7ba50ed4e0a2cfe4d, type: 3}
 --- !u!1 &2100000020
 GameObject:
   m_ObjectHideFlags: 0
@@ -3504,7 +3495,6 @@ MonoBehaviour:
   detailSize: {x: 560, y: 560}
   detailEulerAngles: {x: 0, y: 0, z: 0}
   triggerDate: 14:05
-  audioClip: {fileID: 8300000, guid: ffe5fc6c871b0434f946d1c380195f09, type: 3}
 --- !u!1 &2100000030
 GameObject:
   m_ObjectHideFlags: 0
@@ -3665,7 +3655,6 @@ MonoBehaviour:
   detailSize: {x: 560, y: 560}
   detailEulerAngles: {x: 0, y: 0, z: 0}
   triggerDate: 14:05
-  audioClip: {fileID: 8300000, guid: ffe5fc6c871b0434f946d1c380195f09, type: 3}
 --- !u!1 &2100000040
 GameObject:
   m_ObjectHideFlags: 0
@@ -3826,7 +3815,6 @@ MonoBehaviour:
   detailSize: {x: 520, y: 700}
   detailEulerAngles: {x: 0, y: 0, z: 0}
   triggerDate: 13:58
-  audioClip: {fileID: 8300000, guid: 8cfe4ffe889484a7ba50ed4e0a2cfe4d, type: 3}
 --- !u!1 &2100000050
 GameObject:
   m_ObjectHideFlags: 0
@@ -4026,7 +4014,6 @@ MonoBehaviour:
   detailSize: {x: 560, y: 720}
   detailEulerAngles: {x: 0, y: 0, z: 0}
   triggerDate: 20:07
-  audioClip: {fileID: 8300000, guid: ffe5fc6c871b0434f946d1c380195f09, type: 3}
 --- !u!1 &2100000070
 GameObject:
   m_ObjectHideFlags: 0
@@ -4332,5 +4319,6 @@ MonoBehaviour:
   endingVideoClip: {fileID: 32900000, guid: eaa009734a556409ebeca66e3aef5ca8, type: 3}
   nextSceneName: Assets/Project/Scenes/Chapter_3
   missingVideoFallbackDelay: 0.25
+  endingVideoPlaybackSpeed: 1
   stopOnEndingVideoAudioSources:
   - {fileID: 1367171326}

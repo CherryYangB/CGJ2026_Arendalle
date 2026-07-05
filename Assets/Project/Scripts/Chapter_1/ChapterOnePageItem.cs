@@ -25,7 +25,6 @@ namespace Arendalle
         [Header("Flow")]
         [SerializeField] private string triggerDate = "11:22";
 
-        [Header("Audio")] [SerializeField] private AudioClip audioClip;
         private bool showingBack;
 
         public Sprite CurrentDetailSprite => showingBack && backSprite != null ? backSprite : frontSprite;
@@ -33,7 +32,6 @@ namespace Arendalle
         public bool CanFlipInDetail => canFlipInDetail && backSprite != null;
         public Vector2 DetailSize => detailSize;
         public Vector3 DetailEulerAngles => detailEulerAngles;
-        public AudioClip DetailAudioClip => audioClip;
 
         private void Awake()
         {

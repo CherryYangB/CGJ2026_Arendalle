@@ -35,6 +35,7 @@ namespace Arendalle
         [SerializeField] private VideoClip endingVideoClip;
         [SerializeField] private string nextSceneName = "Assets/Project/Scenes/Chapter_3";
         [SerializeField] private float missingVideoFallbackDelay = 0.25f;
+        [SerializeField, Min(0.01f)] private float endingVideoPlaybackSpeed = 1f;
         [SerializeField] private AudioSource[] stopOnEndingVideoAudioSources;
 
         private bool memoDayDateCompleted;
@@ -426,6 +427,7 @@ namespace Arendalle
             videoPlayer.targetTexture = renderTexture;
             videoPlayer.audioOutputMode = VideoAudioOutputMode.Direct;
             videoPlayer.clip = endingVideoClip;
+            videoPlayer.playbackSpeed = Mathf.Max(0.01f, endingVideoPlaybackSpeed);
             videoPlayer.Prepare();
 
             while (!videoPlayer.isPrepared)

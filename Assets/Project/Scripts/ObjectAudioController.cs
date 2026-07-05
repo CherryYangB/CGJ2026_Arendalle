@@ -8,8 +8,6 @@ public class ObjectAudioController : MonoBehaviour
     public AudioClip appearClipA = null;     // 激活时先播放的音频
     public AudioClip loopClipB = null;       // A 播放完后循环播放的音频
 
-    public AudioSource[] disableAudioSources;
-
     private AudioSource audioSource;
     private Coroutine playRoutine;
     private bool isQuitting;
@@ -22,16 +20,6 @@ public class ObjectAudioController : MonoBehaviour
 
     private void OnEnable()
     {
-        if (disableAudioSources != null)
-        {
-            foreach (var disableAudioSource in disableAudioSources)
-            {
-                if (disableAudioSource.isPlaying)
-                {
-                    disableAudioSource.Pause();
-                }
-            }
-        }
         if (playRoutine != null)
         {
             StopCoroutine(playRoutine);
@@ -74,14 +62,6 @@ public class ObjectAudioController : MonoBehaviour
         if (audioSource != null)
         {
             audioSource.Stop();
-        }
-
-        if (disableAudioSources != null)
-        {
-            foreach (var disableAudioSource in disableAudioSources)
-            {
-                disableAudioSource.UnPause();
-            }
         }
     }
 
