@@ -102,6 +102,7 @@ Now, we're channeling that bond into our very first game jam project for CGJ 202
 - [CGJ 2026 官网 / Official Site ](https://gmhub.com/jams/cgj2026)  
 - [仓库地址 / GitHub Repository ](https://github.com/CherryYangB/CGJ2026_Arendalle)
 - [视频地址 / video ](https://www.bilibili.com/video/BV1dETC6eEhj/?spm_id_from=333.337.search-card.all.click&vd_source=66b4b7e23312e7f747771d2467e172d2)
+- [作品主页 / homepage ](https://gmhub.com/game/10271)
 
 ---
 
