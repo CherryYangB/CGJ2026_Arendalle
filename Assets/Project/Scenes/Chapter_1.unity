@@ -3735,7 +3735,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 72c2a9a74301e40dabca043a47c0a630, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 600d754647a254110b0b67199a0893d6, type: 3}
   m_Type: 0
   m_PreserveAspect: 1
   m_FillCenter: 1
@@ -3818,14 +3818,14 @@ MonoBehaviour:
   detailController: {fileID: 1872168214}
   sceneImage: {fileID: 2100000043}
   sceneButton: {fileID: 2100000044}
-  frontSprite: {fileID: 21300000, guid: 72c2a9a74301e40dabca043a47c0a630, type: 3}
+  frontSprite: {fileID: 21300000, guid: 600d754647a254110b0b67199a0893d6, type: 3}
   backSprite: {fileID: 0}
   frontText: "\u4E00\u5F20\u6CDB\u9EC4\u7684\u5A5A\u793C\u7167\u7247\u3002\u5979\u7A7F\u7740\u767D\u7EB1\uFF0C\u9633\u5149\u521A\u597D\u843D\u5728\u5979\u8138\u4E0A\v\u63D0\u793A\uFF1A\u8FD9\u597D\u50CF\u662F\u5173\u4E8E\u2018\u5F00\u59CB\u2019\u7684\u65E5\u671F\u3002\u8F93\u5165\u5B83\uFF0C\u8BA9\u65F6\u95F4\u5F80\u524D\u8D70\u4E00\u6B65\u3002"
   backText: 
   canFlipInDetail: 0
   detailSize: {x: 520, y: 700}
   detailEulerAngles: {x: 0, y: 0, z: 0}
-  triggerDate: 14:05
+  triggerDate: 13:58
   audioClip: {fileID: 8300000, guid: 8cfe4ffe889484a7ba50ed4e0a2cfe4d, type: 3}
 --- !u!1 &2100000050
 GameObject:
