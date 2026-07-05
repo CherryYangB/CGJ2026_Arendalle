@@ -26,11 +26,12 @@ public class EndSceneController : MonoBehaviour
     [Header("图1→图2 切换")]
     public float autoSwitchDelay = 5f;
 
-    [Header("图2→图3 叠影切换")]
+    [Header("图2→图3 切换")]
+    public float autoSwitchToThirdDelay = 10f;   // 图2对话结束后等待10秒自动切图3
     public float crossFadeDuration = 1.5f;
 
     [Header("图3→图4 淡入")]
-    public float switchToFourthDelay = 5f;      // 图三总停留时间（包含文字显示）
+    public float switchToFourthDelay = 5f;
     public float fourthFadeDuration = 1.5f;
     public float line2Delay = 1.5f;
 
@@ -45,6 +46,7 @@ public class EndSceneController : MonoBehaviour
     private int dialogueStep = 0;
     private bool skipToNext = false;
     private Coroutine autoSwitchCoroutine;
+    private Coroutine autoThirdCoroutine;   // 自动切图3的协程引用
 
     void Start()
     {
@@ -72,7 +74,7 @@ public class EndSceneController : MonoBehaviour
     {
         if (Input.GetMouseButtonDown(0))
         {
-            // 图1→图2切换
+            // 图1→图2切换（尚未显示图2时）
             if (!isSecondImageShown && !isTransitioning)
             {
                 CancelInvoke("AutoSwitch");
@@ -88,7 +90,15 @@ public class EndSceneController : MonoBehaviour
                 else if (dialogueStep == 2)
                     skipToNext = true;
                 else if (dialogueStep == 3)
+                {
+                    // 点击跳过自动等待，立即切图3
+                    if (autoThirdCoroutine != null)
+                    {
+                        StopCoroutine(autoThirdCoroutine);
+                        autoThirdCoroutine = null;
+                    }
                     StartCoroutine(FadeToThird());
+                }
             }
         }
     }
@@ -178,11 +188,38 @@ public class EndSceneController : MonoBehaviour
         }
         dialogueLine2.gameObject.SetActive(false);
 
-        dialogueStep = 3; // 对话结束，等待点击触发图三
+        dialogueStep = 3; // 对话结束
+
+        // 启动自动切换图3的计时器
+        if (autoThirdCoroutine != null)
+            StopCoroutine(autoThirdCoroutine);
+        autoThirdCoroutine = StartCoroutine(AutoTransitionToThird());
+    }
+
+    IEnumerator AutoTransitionToThird()
+    {
+        yield return new WaitForSeconds(autoSwitchToThirdDelay);
+
+        // 如果还没有切换到图3，且不在过渡中，则自动切换
+        if (!isThirdImageShown && !isTransitioning)
+        {
+            StartCoroutine(FadeToThird());
+        }
+        autoThirdCoroutine = null;
     }
 
     IEnumerator FadeToThird()
     {
+        if (isTransitioning) yield break;
+        if (isThirdImageShown) yield break;
+
+        // 停止自动计时器，防止重复触发
+        if (autoThirdCoroutine != null)
+        {
+            StopCoroutine(autoThirdCoroutine);
+            autoThirdCoroutine = null;
+        }
+
         isTransitioning = true;
 
         image3.gameObject.SetActive(true);
@@ -215,26 +252,21 @@ public class EndSceneController : MonoBehaviour
 
     IEnumerator ShowInfoAndDelay()
     {
-        // 显示信息文字
         if (infoText != null)
         {
             infoText.gameObject.SetActive(true);
             infoText.text = infoTextContent;
         }
 
-        // 等待显示时间
         yield return new WaitForSeconds(infoTextDisplayDuration);
 
-        // 隐藏文字
         if (infoText != null)
             infoText.gameObject.SetActive(false);
 
-        // 计算剩余等待时间（确保总时间达到 switchToFourthDelay）
         float remaining = Mathf.Max(0, switchToFourthDelay - infoTextDisplayDuration);
         if (remaining > 0)
             yield return new WaitForSeconds(remaining);
 
-        // 开始图四淡入
         if (!isFourthImageShown)
             StartCoroutine(WaitAndFadeToFourth());
     }

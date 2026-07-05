@@ -136,13 +136,14 @@ GameObject:
   - component: {fileID: 37140904}
   - component: {fileID: 37140903}
   - component: {fileID: 37140902}
+  - component: {fileID: 37140906}
   m_Layer: 5
   m_Name: end_notebook
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &37140901
 RectTransform:
   m_ObjectHideFlags: 0
@@ -211,7 +212,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 2afc8f387c4a74d9b8565d5860dffa0f, type: 3}
+  m_Sprite: {fileID: 21300000, guid: f90d927d33a154e07a9c134dfc3b1f67, type: 3}
   m_Type: 0
   m_PreserveAspect: 1
   m_FillCenter: 1
@@ -229,6 +230,102 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 37140900}
   m_CullTransparentMesh: 1
+--- !u!82 &37140906
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 37140900}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 0}
+  m_audioClip: {fileID: 8300000, guid: 279bd2f6435cd084089f20bc1814e1b3, type: 3}
+  m_PlayOnAwake: 1
+  m_Volume: 1
+  m_Pitch: 1
+  Loop: 0
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!1 &76851057
 GameObject:
   m_ObjectHideFlags: 0
@@ -245,6 +342,7 @@ GameObject:
   - component: {fileID: 76851063}
   - component: {fileID: 76851058}
   - component: {fileID: 76851064}
+  - component: {fileID: 76851066}
   m_Layer: 5
   m_Name: Canvas
   m_TagString: Untagged
@@ -266,7 +364,7 @@ AudioSource:
   m_PlayOnAwake: 1
   m_Volume: 1
   m_Pitch: 1
-  Loop: 0
+  Loop: 1
   Mute: 0
   Spatialize: 0
   SpatializePostEffects: 0
@@ -457,7 +555,7 @@ MonoBehaviour:
   dialogueDuration: 3
   infoText: {fileID: 326867415}
   infoTextContent: "\u636E\u4E16\u754C\u536B\u751F\u7EC4\u7EC7\u7EDF\u8BA1\uFF0C\u5168\u7403\u7EA6\u67095500\u4E07\u4EBA\u60A3\u6709\u75F4\u5446\u75C7\uFF0C\u5176\u4E2D\u963F\u5C14\u8328\u6D77\u9ED8\u75C7\u536060%\u81F370%\u3002\u53D1\u75C5\u7387\u968F\u5E74\u9F84\u589E\u957F\u800C\u4E0A\u5347\uFF0C65\u5C81\u4EE5\u4E0A\u4EBA\u7FA4\u60A3\u75C5\u7387\u7EA6\u4E3A5%\u81F310%\uFF0C85\u5C81\u4EE5\u4E0A\u5347\u81F330%\u4EE5\u4E0A\u3002"
-  infoTextDisplayDuration: 4
+  infoTextDisplayDuration: 6
   endTextLine1: {fileID: 403603165}
   endTextLine2: {fileID: 1207052918}
   fadeCanvasGroup: {fileID: 1917247066}
@@ -465,8 +563,9 @@ MonoBehaviour:
   fadeOutDuration: 0.8
   holdWhiteDuration: 0.5
   autoSwitchDelay: 5
+  autoSwitchToThirdDelay: 4
   crossFadeDuration: 2.5
-  switchToFourthDelay: 8
+  switchToFourthDelay: 10
   fourthFadeDuration: 2.5
   line2Delay: 1.5
   audioSource: {fileID: 76851064}
@@ -586,6 +685,22 @@ MonoBehaviour:
   fadeInDuration: 1
   fadeOutDuration: 0.8
   holdWhiteDuration: 0.5
+--- !u!114 &76851066
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 76851057}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4c8eae7c63997204f95254f04ce487ec, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  whiteMask: {fileID: 1917247066}
+  targetImage: {fileID: 37140903}
+  fadeOutDuration: 2.5
+  holdWhiteDuration: 0.5
 --- !u!1 &326867414
 GameObject:
   m_ObjectHideFlags: 0
@@ -617,7 +732,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.990566, g: 0.990566, b: 0.990566, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -626,7 +741,7 @@ MonoBehaviour:
       m_Calls: []
   m_FontData:
     m_Font: {fileID: 12800000, guid: 526a8a54cf7aa409c88829b56635b1b6, type: 3}
-    m_FontSize: 35
+    m_FontSize: 40
     m_FontStyle: 0
     m_BestFit: 0
     m_MinSize: 3
@@ -797,9 +912,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cfabb0440166ab443bba8876756fdfa9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_EffectColor: {r: 0, g: 0, b: 0, a: 0.5}
-  m_EffectDistance: {x: 5, y: -5}
-  m_UseGraphicAlpha: 1
+  m_EffectColor: {r: 0, g: 0, b: 0, a: 1}
+  m_EffectDistance: {x: 2, y: -2}
+  m_UseGraphicAlpha: 0
 --- !u!114 &597242398
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -823,7 +938,7 @@ MonoBehaviour:
   m_FontData:
     m_Font: {fileID: 12800000, guid: 526a8a54cf7aa409c88829b56635b1b6, type: 3}
     m_FontSize: 50
-    m_FontStyle: 0
+    m_FontStyle: 1
     m_BestFit: 0
     m_MinSize: 4
     m_MaxSize: 300
@@ -1023,8 +1138,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cfabb0440166ab443bba8876756fdfa9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_EffectColor: {r: 0, g: 0, b: 0, a: 0.5}
-  m_EffectDistance: {x: 5, y: -5}
+  m_EffectColor: {r: 0, g: 0, b: 0, a: 1}
+  m_EffectDistance: {x: 2, y: -2}
   m_UseGraphicAlpha: 1
 --- !u!114 &1337080721
 MonoBehaviour:
@@ -1049,7 +1164,7 @@ MonoBehaviour:
   m_FontData:
     m_Font: {fileID: 12800000, guid: 526a8a54cf7aa409c88829b56635b1b6, type: 3}
     m_FontSize: 50
-    m_FontStyle: 0
+    m_FontStyle: 1
     m_BestFit: 0
     m_MinSize: 4
     m_MaxSize: 50
@@ -1059,7 +1174,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "\u201D\u6709\u4E0D\u8BB0\u5F97\u6211\u4E86\uFF1F\u6211\u662F\u4F60\u4EB2\u95FA\u5973\u5440......\u201C"
+  m_Text: "\u201D\u53C8\u4E0D\u8BB0\u5F97\u6211\u4E86\uFF1F\u6211\u662F\u4F60\u4EB2\u95FA\u5973\u5440......\u201C"
 --- !u!222 &1337080722
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -1578,13 +1693,14 @@ GameObject:
   - component: {fileID: 2123721988}
   - component: {fileID: 2123721987}
   - component: {fileID: 2123721990}
+  - component: {fileID: 2123721991}
   m_Layer: 5
   m_Name: end_bedroom
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &2123721987
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1656,6 +1772,102 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 8300000, guid: 9793db0d878254d339837e91b6c7e11e, type: 3}
+  m_PlayOnAwake: 1
+  m_Volume: 1
+  m_Pitch: 1
+  Loop: 0
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+--- !u!82 &2123721991
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2123721986}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 0}
+  m_audioClip: {fileID: 8300000, guid: 0f85fbf4996d845129b0a9b3c11abb09, type: 3}
   m_PlayOnAwake: 1
   m_Volume: 1
   m_Pitch: 1
