@@ -9,6 +9,7 @@
 玩家将翻开一本泛黄的日记本，跟随一位在记忆中迷路的老人，在碎片化的日常物件中寻找“锚点”——那些被遗忘却依然发光的时间。
 一本日记、一块手表、一张票根、一段旋律……每一个记忆碎片，都是通往过去的钥匙。
 游戏以日记本翻页为核心交互，融合物件探索、日期输入、节奏解密等轻量玩法，带领玩家体验一段关于遗忘与守护的温暖故事。
+
 The Anchor of Memory is a 2D narrative puzzle game about Alzheimer's disease.
 You will open a faded diary and follow an elderly man lost in his memories, searching for "anchors"—moments in time that still glow despite being forgotten.
 A diary, a watch, a ticket stub, a melody… each fragment is a key to the past.
@@ -26,6 +27,7 @@ Built around a diary-turning core mechanic, the game blends object exploration, 
 - 🎵 音乐解密 —— 用音符唤醒沉睡的记忆
 - 🎨 手绘美术 —— 温暖克制的视觉风格，褪色与回忆交织
 - 🎼 原创配乐 —— 以旋律为锚，让情感自然流淌
+  
 We aim to create a heartfelt short game experience where art and music are the core of the gameplay.
 - 📖 Diary-driven narrative — each page holds a puzzle, each page holds a life
 - 🎵 Musical puzzles — awaken sleeping memories through melody
@@ -41,6 +43,7 @@ We aim to create a heartfelt short game experience where art and music are the c
 我们是一支相识多年的团队，因共同热爱《冰雪奇缘》而结缘。
 从分享同人绘画与音乐开始，逐渐成长为多年的创作伙伴。
 如今，我们将这份友谊与默契融入 CGJ 2026 的第一个游戏创作中——一款以美术、音乐和情感为核心的作品。
+
 We are a team of longtime friends, brought together years ago by our shared love for Frozen.
 What started as fan art and music sharing has grown into years of creative collaboration.
 Now, we're channeling that bond into our very first game jam project for CGJ 2026 — a game built on art, music, and heart.
