@@ -56,7 +56,7 @@ Now, we're channeling that bond into our very first game jam project for CGJ 202
 | **策划&程序员 / Designer&Programmer** | Yang阳B |
 | **程序员 / Programmer** | Nour |
 | **美术 / Artist** | Sophialexa |
-| **美术 / Artist** | 凇淞 |
+| **美术 / Artist** | 凇松 |
 | **音乐/Musician** | JINBOZ |
 
 ---
