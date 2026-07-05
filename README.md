@@ -3,6 +3,15 @@
 
 ---
 
+> “I feel as if I'm losing all my leaves... the branches, and the wind, and the rain. I have nowhere to put my head down anymore.”
+> 
+> “我感觉自己正在一片片凋零……那些树枝，还有风和雨。我再也没有栖身之地了。”
+> 
+> --《困在时间的父亲》（The Father，2020）
+
+
+---
+
 ## 🎮 关于游戏 / About the Game 
 
 《记忆之锚》 是一款以 阿尔茨海默症 为题材的2D叙事解谜游戏。
@@ -98,9 +107,13 @@ Now, we're channeling that bond into our very first game jam project for CGJ 202
 All rights reserved. This project is created for the CGJ 2026 game jam and is not open for commercial use without permission.
 
 
+---
 
-> *即使终将遗忘，爱永远是回家的锚。*
-> *Even when memories fade, love is always the anchor that brings us home.*
+> **即使终将遗忘，爱永远是回家的锚。**
+
+> **Even when memories fade, love is always the anchor that brings us home.**
+
 > 献给所有在记忆中迷失的人，和所有守护他们的人。
+
 > For those lost in memory, and for those who stay by their side.
 
