@@ -36,12 +36,12 @@ namespace Arendalle
         [Header("Text")]
         [SerializeField] private string[] preferredFontNames =
         {
-            "PingFang SC",
-            "Hiragino Sans GB",
-            "Microsoft YaHei",
-            "Noto Sans CJK SC",
-            "Arial Unicode MS",
-            "Arial"
+            "default",
+            "default",
+            "default",
+            "default",
+            "default",
+            "default"
         };
 
         private Coroutine runningRoutine;
