@@ -420,6 +420,10 @@ namespace Arendalle.EditorTools
 
             Image background = CreateImage("ParchmentBackground", homeRoot.transform, null, new Color(0.93f, 0.92f, 0.86f, 1f));
             Stretch(background.rectTransform);
+            background.raycastTarget = false;
+            CanvasGroup backgroundGroup = background.gameObject.AddComponent<CanvasGroup>();
+            backgroundGroup.interactable = false;
+            backgroundGroup.blocksRaycasts = false;
 
             Image border = CreateImage("HandDrawnBorder", homeRoot.transform, borderSprite, Color.white);
             Stretch(border.rectTransform);
