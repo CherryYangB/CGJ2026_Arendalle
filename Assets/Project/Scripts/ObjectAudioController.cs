@@ -28,7 +28,7 @@ public class ObjectAudioController : MonoBehaviour
             {
                 if (disableAudioSource.isPlaying)
                 {
-                    disableAudioSource.Stop();
+                    disableAudioSource.Pause();
                 }
             }
         }
@@ -80,10 +80,7 @@ public class ObjectAudioController : MonoBehaviour
         {
             foreach (var disableAudioSource in disableAudioSources)
             {
-                if (!disableAudioSource.isPlaying)
-                {
-                    disableAudioSource.Play();
-                }
+                disableAudioSource.UnPause();
             }
         }
     }

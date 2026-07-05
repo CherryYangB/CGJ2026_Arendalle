@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -50,10 +51,16 @@ namespace Arendalle
         [SerializeField] private float pageTurnHintBlinkDuration = 1.8f;
         [SerializeField] private float pageTurnHintMaxAlpha = 0.22f;
 
+        [Header("Audio")]
+        [SerializeField] private AudioSource[] pauseOnDetailAudioSources;
+        [SerializeField] private AudioSource detailAudioSource;
+        [SerializeField, Range(0f, 1f)] private float detailAudioVolume = 1f;
+
         private Coroutine detailRoutine;
         private Coroutine pageTurnRoutine;
         private Coroutine pageTurnHintRoutine;
         private ChapterOnePageItem activePageItem;
+        private readonly List<AudioSource> pausedDetailAudioSources = new List<AudioSource>();
         private Vector2 defaultDetailObjectSize;
         private Vector3 defaultDetailObjectEulerAngles;
         private Vector2 defaultPageTurnHighlightPosition;
@@ -74,6 +81,7 @@ namespace Arendalle
             CacheDetailObjectDefaults();
             CachePageTurnHighlightDefaults();
             ConfigureDetailObjectButton();
+            ConfigurePageTurnAudioSource();
 
             if (memoImage != null && memoHomeSprite != null)
             {
@@ -147,6 +155,8 @@ namespace Arendalle
             {
                 watchTimeDisplay.FirstOpened -= HandleWatchFirstOpened;
             }
+
+            StopPageItemAudioAndResume();
         }
 
         private void RegisterListeners()
@@ -237,6 +247,7 @@ namespace Arendalle
             activePageItem = item;
             activePageItem.ResetDetailSide();
             ApplyActivePageItemDetail();
+            PlayActivePageItemAudio();
             StartDetailRoutine(ShowDetailRoutine());
         }
 
@@ -367,6 +378,8 @@ namespace Arendalle
 
         private IEnumerator HideDetailRoutine()
         {
+            StopPageItemAudioAndResume();
+
             if (itemGroup != null && !IsPageTurned)
             {
                 itemGroup.interactable = true;
@@ -434,6 +447,8 @@ namespace Arendalle
                 pageTurnHighlight.gameObject.SetActive(true);
                 SetImageAlpha(pageTurnHighlight, 0f);
             }
+
+            PlayPageTurnAudio();
 
             float elapsed = 0f;
             while (elapsed < pageTurnDuration)
@@ -537,6 +552,8 @@ namespace Arendalle
                 pageTurnHighlight.gameObject.SetActive(true);
                 SetImageAlpha(pageTurnHighlight, 0f);
             }
+
+            PlayPageTurnAudio();
 
             float elapsed = 0f;
             while (elapsed < pageTurnDuration)
@@ -770,6 +787,119 @@ namespace Arendalle
             RectTransform rectTransform = pageTurnHighlight.rectTransform;
             rectTransform.anchoredPosition = defaultPageTurnHighlightPosition;
             rectTransform.sizeDelta = defaultPageTurnHighlightSize;
+        }
+
+        private void ConfigurePageTurnAudioSource()
+        {
+            AudioSource pageTurnAudioSource = GetPageTurnAudioSource();
+            if (pageTurnAudioSource == null)
+            {
+                return;
+            }
+
+            pageTurnAudioSource.playOnAwake = false;
+            pageTurnAudioSource.loop = false;
+            pageTurnAudioSource.spatialBlend = 0f;
+        }
+
+        private void PlayPageTurnAudio()
+        {
+            AudioSource pageTurnAudioSource = GetPageTurnAudioSource();
+            if (pageTurnAudioSource == null || pageTurnAudioSource.clip == null)
+            {
+                return;
+            }
+
+            pageTurnAudioSource.Stop();
+            pageTurnAudioSource.Play();
+        }
+
+        private AudioSource GetPageTurnAudioSource()
+        {
+            return pageTurnHighlight != null ? pageTurnHighlight.GetComponent<AudioSource>() : null;
+        }
+
+        private void PlayActivePageItemAudio()
+        {
+            PauseDetailAudioSources();
+
+            AudioClip clip = activePageItem != null ? activePageItem.DetailAudioClip : null;
+            if (clip == null)
+            {
+                return;
+            }
+
+            AudioSource source = EnsureDetailAudioSource();
+            if (source == null)
+            {
+                return;
+            }
+
+            source.Stop();
+            source.clip = clip;
+            source.volume = detailAudioVolume;
+            source.loop = false;
+            source.playOnAwake = false;
+            source.spatialBlend = 0f;
+            source.Play();
+        }
+
+        private void PauseDetailAudioSources()
+        {
+            pausedDetailAudioSources.Clear();
+            if (pauseOnDetailAudioSources == null)
+            {
+                return;
+            }
+
+            foreach (AudioSource source in pauseOnDetailAudioSources)
+            {
+                if (source == null || source == detailAudioSource || !source.isPlaying)
+                {
+                    continue;
+                }
+
+                source.Pause();
+                pausedDetailAudioSources.Add(source);
+            }
+        }
+
+        private void StopPageItemAudioAndResume()
+        {
+            if (detailAudioSource != null)
+            {
+                detailAudioSource.Stop();
+            }
+
+            ResumePausedDetailAudioSources();
+        }
+
+        private void ResumePausedDetailAudioSources()
+        {
+            foreach (AudioSource source in pausedDetailAudioSources)
+            {
+                if (source != null)
+                {
+                    source.UnPause();
+                }
+            }
+
+            pausedDetailAudioSources.Clear();
+        }
+
+        private AudioSource EnsureDetailAudioSource()
+        {
+            if (detailAudioSource == null)
+            {
+                detailAudioSource = GetComponent<AudioSource>();
+            }
+
+            if (detailAudioSource == null)
+            {
+                detailAudioSource = gameObject.AddComponent<AudioSource>();
+            }
+
+            return detailAudioSource;
         }
 
         private void ConfigureDetailObjectButton()

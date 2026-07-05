@@ -17,10 +17,14 @@ namespace Arendalle.EditorTools
 
         private const string HomeScenePath = "Assets/Project/Scenes/Home.unity";
         private const string ChapterScenePath = "Assets/Project/Scenes/Chapter_1.unity";
-        private const string ChapterTwoScenePath = "Assets/Project/Scenes/Chapter_2.unity";
+        private const string ChapterThreeScenePath = "Assets/Project/Scenes/Chapter_3.unity";
         private const string BorderSpritePath = "Assets/Project/Art/UI/HomeMenuBorder.png";
         private const string ButtonSpritePath = "Assets/Project/Art/UI/HandDrawnButton.png";
         private const string ClickAudioPath = "Assets/Project/Audio/Click,.wav";
+        private const string PageFlippingAudioPath = "Assets/Project/Audio/PageFlipping.wav";
+        private const string WatchSuccessAudioPath = "Assets/Project/Audio/watchSuccess.wav";
+        private const string WatchWrongAudioPath = "Assets/Project/Audio/watchWRONG.wav";
+        private const string DefaultFontPath = "Assets/Project/Art/Font/default.TTF";
         private const string ChapterBackgroundSpritePath = "Assets/Project/Art/Background/bg_bg_s1_v1.png";
         private const string MemoHomeSpritePath = "Assets/Project/Art/Background/bg_memo_home.png";
         private const string MemoPageOneSpritePath = "Assets/Project/Art/Background/bg_memo_page_1.png";
@@ -395,7 +399,7 @@ namespace Arendalle.EditorTools
             Sprite borderSprite = AssetDatabase.LoadAssetAtPath<Sprite>(BorderSpritePath);
             Sprite buttonSprite = AssetDatabase.LoadAssetAtPath<Sprite>(ButtonSpritePath);
             AudioClip clickAudioClip = AssetDatabase.LoadAssetAtPath<AudioClip>(ClickAudioPath);
-            Font font = GetDefaultFont();
+            Font font = GetDefaultFont(true);
 
             GameObject canvasObject = new GameObject("HomeMenuCanvas", typeof(RectTransform), typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
             Canvas canvas = canvasObject.GetComponent<Canvas>();
@@ -502,7 +506,8 @@ namespace Arendalle.EditorTools
             Sprite movieTicketTwoSprite = AssetDatabase.LoadAssetAtPath<Sprite>(MovieTicketTwoSpritePath);
             Sprite movieTicketBackSprite = AssetDatabase.LoadAssetAtPath<Sprite>(MovieTicketBackSpritePath);
             Sprite marriedPhotoSprite = AssetDatabase.LoadAssetAtPath<Sprite>(MarriedPhotoSpritePath);
-            Font font = GetDefaultFont();
+            AudioClip pageFlippingAudioClip = AssetDatabase.LoadAssetAtPath<AudioClip>(PageFlippingAudioPath);
+            Font font = GetDefaultFont(true);
 
             GameObject canvasObject = new GameObject("ChapterCanvas", typeof(RectTransform), typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
             Canvas canvas = canvasObject.GetComponent<Canvas>();
@@ -626,6 +631,11 @@ namespace Arendalle.EditorTools
             SetRect(pageTurnHighlight.rectTransform, new Vector2(0.5f, 0.5f), new Vector2(64f, 820f), new Vector2(575f, 0f));
             pageTurnHighlight.raycastTarget = false;
             pageTurnHighlight.gameObject.SetActive(false);
+            AudioSource pageTurnAudioSource = pageTurnHighlight.gameObject.AddComponent<AudioSource>();
+            pageTurnAudioSource.clip = pageFlippingAudioClip;
+            pageTurnAudioSource.playOnAwake = false;
+            pageTurnAudioSource.loop = false;
+            pageTurnAudioSource.spatialBlend = 0f;
 
             Image pageEdgeHotspotImage = CreateImage("PageEdgeHotspot", memoRoot.transform, null, new Color(1f, 1f, 1f, 0f));
             SetRect(pageEdgeHotspotImage.rectTransform, new Vector2(0.5f, 0.5f), new Vector2(170f, 760f), new Vector2(575f, 0f));
@@ -909,6 +919,8 @@ namespace Arendalle.EditorTools
             SetWatchDateRect(detailDateText.rectTransform, detailWatchSize);
             detailDateText.rectTransform.sizeDelta = sceneDateText.rectTransform.sizeDelta;
             InputField detailDateInputField = AddDateInputField(detailDateText);
+            AudioClip watchSuccessClip = AssetDatabase.LoadAssetAtPath<AudioClip>(WatchSuccessAudioPath);
+            AudioClip watchWrongClip = AssetDatabase.LoadAssetAtPath<AudioClip>(WatchWrongAudioPath);
 
             Text copyText = CreateText("WatchDetailCopyText", detailRoot.transform, string.Empty, font, 34, TextAnchor.UpperLeft);
             copyText.color = new Color(0.98f, 0.96f, 0.88f, 1f);
@@ -933,6 +945,10 @@ namespace Arendalle.EditorTools
             serializedObject.FindProperty("fadeDuration").floatValue = 0.24f;
             serializedObject.FindProperty("detailScaleDuration").floatValue = 0.28f;
             serializedObject.FindProperty("detailBackdropAlpha").floatValue = 0.68f;
+            serializedObject.FindProperty("watchSuccessClip").objectReferenceValue = watchSuccessClip;
+            serializedObject.FindProperty("watchWrongClip").objectReferenceValue = watchWrongClip;
+            serializedObject.FindProperty("watchFeedbackAudioSource").objectReferenceValue = null;
+            serializedObject.FindProperty("watchFeedbackVolume").floatValue = 1f;
             serializedObject.ApplyModifiedPropertiesWithoutUndo();
 
             return watchTimeDisplay;
@@ -1013,8 +1029,17 @@ namespace Arendalle.EditorTools
             rectTransform.localScale = Vector3.one;
         }
 
-        private static Font GetDefaultFont()
+        private static Font GetDefaultFont(bool preferProjectFont = false)
         {
+            if (preferProjectFont)
+            {
+                Font projectFont = AssetDatabase.LoadAssetAtPath<Font>(DefaultFontPath);
+                if (projectFont != null)
+                {
+                    return projectFont;
+                }
+            }
+
             Font font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
             if (font != null)
             {
@@ -1136,6 +1161,9 @@ namespace Arendalle.EditorTools
             serializedObject.FindProperty("pageTurnDuration").floatValue = 0.68f;
             serializedObject.FindProperty("pageTurnHintBlinkDuration").floatValue = 1.8f;
             serializedObject.FindProperty("pageTurnHintMaxAlpha").floatValue = 0.22f;
+            serializedObject.FindProperty("pauseOnDetailAudioSources").arraySize = 0;
+            serializedObject.FindProperty("detailAudioSource").objectReferenceValue = null;
+            serializedObject.FindProperty("detailAudioVolume").floatValue = 1f;
             serializedObject.ApplyModifiedPropertiesWithoutUndo();
         }
 
@@ -1202,8 +1230,9 @@ namespace Arendalle.EditorTools
             serializedObject.FindProperty("marriedPhotoDateGateItem").objectReferenceValue = marriedPhoto;
             serializedObject.FindProperty("marriedPhotoEndingDate").stringValue = "05:20";
             serializedObject.FindProperty("endingVideoClip").objectReferenceValue = null;
-            serializedObject.FindProperty("nextSceneName").stringValue = "Chapter_2";
+            serializedObject.FindProperty("nextSceneName").stringValue = "Assets/Project/Scenes/Chapter_3";
             serializedObject.FindProperty("missingVideoFallbackDelay").floatValue = 0.25f;
+            serializedObject.FindProperty("stopOnEndingVideoAudioSources").arraySize = 0;
             serializedObject.ApplyModifiedPropertiesWithoutUndo();
         }
 
@@ -1213,7 +1242,7 @@ namespace Arendalle.EditorTools
             {
                 HomeScenePath,
                 ChapterScenePath,
-                ChapterTwoScenePath,
+                ChapterThreeScenePath,
                 "Assets/Scenes/SampleScene.unity"
             };
 

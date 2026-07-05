@@ -33,8 +33,9 @@ namespace Arendalle
 
         [Header("Ending Video")]
         [SerializeField] private VideoClip endingVideoClip;
-        [SerializeField] private string nextSceneName = "Chapter_2";
+        [SerializeField] private string nextSceneName = "Assets/Project/Scenes/Chapter_3";
         [SerializeField] private float missingVideoFallbackDelay = 0.25f;
+        [SerializeField] private AudioSource[] stopOnEndingVideoAudioSources;
 
         private bool memoDayDateCompleted;
         private bool movieTicketDateCompleted;
@@ -60,7 +61,7 @@ namespace Arendalle
 
             if (watchTimeDisplay != null)
             {
-                watchTimeDisplay.TimeChanged -= HandleTimeChanged;
+                watchTimeDisplay.TimeSubmitted -= HandleTimeSubmitted;
             }
         }
 
@@ -143,8 +144,8 @@ namespace Arendalle
 
             if (watchTimeDisplay != null)
             {
-                watchTimeDisplay.TimeChanged -= HandleTimeChanged;
-                watchTimeDisplay.TimeChanged += HandleTimeChanged;
+                watchTimeDisplay.TimeSubmitted -= HandleTimeSubmitted;
+                watchTimeDisplay.TimeSubmitted += HandleTimeSubmitted;
             }
         }
 
@@ -154,11 +155,11 @@ namespace Arendalle
             UpdateControllerUnlock();
         }
 
-        private void HandleTimeChanged(TimeSpan time)
+        private bool HandleTimeSubmitted(TimeSpan time)
         {
             if (chapterController == null || endingStarted)
             {
-                return;
+                return false;
             }
 
             if (chapterController.CurrentPageIndex == 1)
@@ -182,7 +183,7 @@ namespace Arendalle
                     UpdateControllerUnlock();
                 }
 
-                return;
+                return changed;
             }
 
             if (chapterController.CurrentPageIndex == 2)
@@ -205,7 +206,11 @@ namespace Arendalle
                     ApplyVisibility();
                     UpdateControllerUnlock();
                 }
+
+                return changed;
             }
+
+            return false;
         }
 
         private void HandleFinalPageTurned()
@@ -381,6 +386,7 @@ namespace Arendalle
             }
 
             endingStarted = true;
+            StopEndingVideoAudioSources();
 
             if (endingVideoClip == null)
             {
@@ -441,13 +447,79 @@ namespace Arendalle
 
         private void LoadNextScene()
         {
-            if (!string.IsNullOrWhiteSpace(nextSceneName) && Application.CanStreamedLevelBeLoaded(nextSceneName))
+            if (TryLoadScene(nextSceneName))
             {
-                SceneManager.LoadScene(nextSceneName);
                 return;
             }
 
-            Debug.LogWarning($"Cannot load scene '{nextSceneName}'. Add it to Build Settings when Chapter_2 is ready.");
+            Debug.LogWarning($"Cannot load scene '{nextSceneName}'. Add it to Build Settings when Chapter_3 is ready.");
+        }
+
+        private static bool TryLoadScene(string sceneReference)
+        {
+            if (string.IsNullOrWhiteSpace(sceneReference))
+            {
+                return false;
+            }
+
+            string trimmedReference = sceneReference.Trim();
+            if (TryLoadSceneCandidate(trimmedReference))
+            {
+                return true;
+            }
+
+            if (trimmedReference.StartsWith("Assets/", StringComparison.Ordinal)
+                && !trimmedReference.EndsWith(".unity", StringComparison.OrdinalIgnoreCase)
+                && TryLoadSceneCandidate(trimmedReference + ".unity"))
+            {
+                return true;
+            }
+
+            string sceneName = GetSceneNameFromReference(trimmedReference);
+            return !string.Equals(sceneName, trimmedReference, StringComparison.Ordinal)
+                && TryLoadSceneCandidate(sceneName);
+        }
+
+        private static bool TryLoadSceneCandidate(string sceneReference)
+        {
+            if (string.IsNullOrWhiteSpace(sceneReference) || !Application.CanStreamedLevelBeLoaded(sceneReference))
+            {
+                return false;
+            }
+
+            SceneManager.LoadScene(sceneReference);
+            return true;
+        }
+
+        private static string GetSceneNameFromReference(string sceneReference)
+        {
+            string normalizedReference = sceneReference.Replace('\\', '/');
+            int slashIndex = normalizedReference.LastIndexOf('/');
+            string sceneName = slashIndex >= 0 ? normalizedReference.Substring(slashIndex + 1) : normalizedReference;
+
+            if (sceneName.EndsWith(".unity", StringComparison.OrdinalIgnoreCase))
+            {
+                sceneName = sceneName.Substring(0, sceneName.Length - ".unity".Length);
+            }
+
+            return sceneName;
+        }
+
+        private void StopEndingVideoAudioSources()
+        {
+            if (stopOnEndingVideoAudioSources == null)
+            {
+                return;
+            }
+
+            for (int i = 0; i < stopOnEndingVideoAudioSources.Length; i++)
+            {
+                AudioSource source = stopOnEndingVideoAudioSources[i];
+                if (source != null)
+                {
+                    source.Stop();
+                }
+            }
         }
     }
 }

@@ -31,18 +31,26 @@ namespace Arendalle
         [SerializeField] private float detailScaleDuration = 0.28f;
         [SerializeField] private float detailBackdropAlpha = 0.68f;
 
+        [Header("Audio")]
+        [SerializeField] private AudioClip watchSuccessClip;
+        [SerializeField] private AudioClip watchWrongClip;
+        [SerializeField] private AudioSource watchFeedbackAudioSource;
+        [SerializeField, Range(0f, 1f)] private float watchFeedbackVolume = 1f;
+
         private TimeSpan displayedTime;
         private Coroutine detailRoutine;
         private bool detailOpen;
         private bool docked;
         private bool requestedSceneInteractable = true;
         private bool suppressTimeInputCommit;
+        private bool submitRequestedByReturn;
 
         public bool IsDetailOpen => detailOpen;
         public bool HasBeenOpened { get; private set; }
         public TimeSpan DisplayedTime => displayedTime;
         public event Action FirstOpened;
         public event Action<TimeSpan> TimeChanged;
+        public event Func<TimeSpan, bool> TimeSubmitted;
 
         private void Awake()
         {
@@ -54,6 +62,19 @@ namespace Arendalle
             ApplySceneInteractable();
             UpdateTimeTexts();
             SyncDetailDateLayoutFromScene();
+        }
+
+        private void Update()
+        {
+            if (detailDateInputField == null || !detailDateInputField.isFocused)
+            {
+                return;
+            }
+
+            if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter))
+            {
+                submitRequestedByReturn = true;
+            }
         }
 
         private void OnDestroy()
@@ -242,6 +263,7 @@ namespace Arendalle
             detailDateInputField.contentType = InputField.ContentType.Standard;
             detailDateInputField.lineType = InputField.LineType.SingleLine;
             detailDateInputField.characterLimit = 5;
+            detailDateInputField.onValidateInput = ValidateClockInputCharacter;
         }
 
         private void SyncDetailDateLayoutFromScene()
@@ -295,7 +317,7 @@ namespace Arendalle
             if (detailDateInputField != null)
             {
                 suppressTimeInputCommit = true;
-                detailDateInputField.text = value;
+                detailDateInputField.SetTextWithoutNotify(value);
                 suppressTimeInputCommit = false;
             }
         }
@@ -307,7 +329,15 @@ namespace Arendalle
                 return;
             }
 
+            bool submittedByReturn = ConsumeReturnSubmitRequest();
+            if (!submittedByReturn)
+            {
+                UpdateTimeTexts();
+                return;
+            }
+
             bool parsed = TryParseClockTime(input, out TimeSpan parsedTime);
+            bool accepted = false;
             if (parsed)
             {
                 displayedTime = parsedTime;
@@ -317,8 +347,77 @@ namespace Arendalle
 
             if (parsed)
             {
+                accepted = NotifyTimeSubmitted(displayedTime);
                 TimeChanged?.Invoke(displayedTime);
             }
+
+            PlayWatchFeedback(parsed && accepted);
+        }
+
+        private bool ConsumeReturnSubmitRequest()
+        {
+            bool submitted = submitRequestedByReturn
+                || Input.GetKeyDown(KeyCode.Return)
+                || Input.GetKeyDown(KeyCode.KeypadEnter);
+
+            submitRequestedByReturn = false;
+            return submitted;
+        }
+
+        private bool NotifyTimeSubmitted(TimeSpan time)
+        {
+            if (TimeSubmitted == null)
+            {
+                return false;
+            }
+
+            bool accepted = false;
+            Delegate[] handlers = TimeSubmitted.GetInvocationList();
+            for (int i = 0; i < handlers.Length; i++)
+            {
+                if (handlers[i] is Func<TimeSpan, bool> handler)
+                {
+                    accepted |= handler(time);
+                }
+            }
+
+            return accepted;
+        }
+
+        private void PlayWatchFeedback(bool success)
+        {
+            AudioClip clip = success ? watchSuccessClip : watchWrongClip;
+            if (clip == null)
+            {
+                return;
+            }
+
+            AudioSource source = EnsureWatchFeedbackAudioSource();
+            if (source == null)
+            {
+                return;
+            }
+
+            source.Stop();
+            source.PlayOneShot(clip, watchFeedbackVolume);
+        }
+
+        private AudioSource EnsureWatchFeedbackAudioSource()
+        {
+            if (watchFeedbackAudioSource == null)
+            {
+                watchFeedbackAudioSource = GetComponent<AudioSource>();
+            }
+
+            if (watchFeedbackAudioSource == null)
+            {
+                watchFeedbackAudioSource = gameObject.AddComponent<AudioSource>();
+            }
+
+            watchFeedbackAudioSource.playOnAwake = false;
+            watchFeedbackAudioSource.loop = false;
+            watchFeedbackAudioSource.spatialBlend = 0f;
+            return watchFeedbackAudioSource;
         }
 
         private void SetDetailVisible(bool visible, float alpha)
@@ -384,6 +483,21 @@ namespace Arendalle
         private static string FormatClockTime(TimeSpan time)
         {
             return $"{time.Hours:00}:{time.Minutes:00}";
+        }
+
+        private static char ValidateClockInputCharacter(string text, int charIndex, char addedChar)
+        {
+            if (char.IsDigit(addedChar))
+            {
+                return addedChar;
+            }
+
+            if ((addedChar == ':' || addedChar == '.') && text.IndexOf(':') < 0 && text.IndexOf('.') < 0)
+            {
+                return ':';
+            }
+
+            return '\0';
         }
 
         private static bool TryParseClockTime(string value, out TimeSpan parsedTime)
